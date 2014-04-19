@@ -1,2 +1,4 @@
-*.o
-HWDaemon
+bin/
+obj/
+*.depend
+*.layout

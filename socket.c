@@ -53,7 +53,7 @@ int SocketHandleClients(){
 }
 
 void SocketClose(){
-	if(thread!=0){ 
+	if(thread!=0){
 		close(socketClient);
 		term = 1;
 		pthread_join(thread, NULL);
@@ -152,19 +152,3 @@ void SocketSendCompass(double angle){
 
 
 
-void SocketHandleReceivedEvent(struct Event ev){
-	printf("\e[2mVOUS DEVEZ REECRIRE %s DANS %s:%d\e[m\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-
-	switch(ev.id){
-		case DEVICE_ID_SAIL:
-			printf("Received Sail=%d\n", ConvertToSailValue(ev.data));
-			break;
-		case DEVICE_ID_HELM:
-			printf("Received Helm=%f\n", ConvertToHelmValue(ev.data));
-			break;
-
-		default:
-			printf("Received unhandled device value");
-			break;
-	}
-}

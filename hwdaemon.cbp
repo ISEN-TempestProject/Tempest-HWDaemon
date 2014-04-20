@@ -26,6 +26,9 @@
 				<Linker>
 					<Add option="-s" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="cp ${TARGET_OUTPUT_FILE} /tmp/sshfs" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>

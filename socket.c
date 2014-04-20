@@ -1,6 +1,7 @@
 #include "socket.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -39,6 +40,7 @@ void* SocketThread(){
 		socketClient = -1;
 		printf("Client closed connection\n");
 	}
+	return 0;
 }
 
 

@@ -7,6 +7,7 @@ extern "C"{
 }
 
 #include "Pwm.hpp"
+#include "Adc.hpp"
 
 
 Pwm* pwmMainSail;
@@ -58,6 +59,8 @@ int main(int argc, char const *argv[])
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
+	Adc adc(0);
+
 
 	int error = SocketInit();
 	if(error==0){
@@ -92,6 +95,8 @@ int main(int argc, char const *argv[])
 					SocketSendCompass(value);
 					break;
 			}
+
+			printf("%d\n", adc.Get());
 
 			usleep(100000*(rand()%10+5));
 		}

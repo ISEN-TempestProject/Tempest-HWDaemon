@@ -5,26 +5,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include "utils.hpp"
 
 using namespace std;
 
 string Pwm::m_sCapePath("");
 string Pwm::m_sOCPPath("");
-
-
-string FindDirContaining(const string& sParent, const string& sName){
-	DIR* dir = opendir(sParent.c_str());
-	if(dir==nullptr)
-		return "";
-
-	struct dirent* file;
-	while ((file = readdir(dir)) != nullptr){
-		if(string(file->d_name).find(sName)!=string::npos)
-			return sParent+"/"+file->d_name;
-	}
-	closedir(dir);
-	return "";
-}
 
 
 Pwm::Pwm(const string& pin, long periodNS, long dutyNS){

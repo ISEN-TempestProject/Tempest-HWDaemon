@@ -10,15 +10,15 @@ extern "C"{
 
 
 Pwm* pwmMainSail;
-#define MAIN_SAIL_DUTY_MIN 1000000
-#define MAIN_SAIL_DUTY_MAX 2000000
+#define MAIN_SAIL_DUTY_MIN 600000
+#define MAIN_SAIL_DUTY_MAX 2400000
 Pwm* pwmSecondSail;
-#define SECOND_SAIL_DUTY_MIN 1000000
-#define SECOND_SAIL_DUTY_MAX 2000000
+#define SECOND_SAIL_DUTY_MIN 600000
+#define SECOND_SAIL_DUTY_MAX 2400000
 
 Pwm* pwmHelm;
-#define SECOND_SAIL_DUTY_MIN 1000000
-#define SECOND_SAIL_DUTY_MAX 2000000
+#define HELM_DUTY_MIN 600000.0
+#define HELM_DUTY_MAX 2400000.0
 
 
 void SocketHandleReceivedEvent(struct Event ev){
@@ -30,17 +30,22 @@ void SocketHandleReceivedEvent(struct Event ev){
 			unsigned short val = ConvertToSailValue(ev.data);
 			printf("Received Sail=%d\n", val);
 			pwmMainSail->SetDuty(
-								(MAIN_SAIL_DUTY_MAX+MAIN_SAIL_DUTY_MIN)*(val/255.0)+MAIN_SAIL_DUTY_MIN
+								(MAIN_SAIL_DUTY_MAX-MAIN_SAIL_DUTY_MIN)*(val/255.0)+MAIN_SAIL_DUTY_MIN
 								);
 			pwmSecondSail->SetDuty(
-								(SECOND_SAIL_DUTY_MAX+SECOND_SAIL_DUTY_MIN)*(val/255.0)+SECOND_SAIL_DUTY_MIN
+								(SECOND_SAIL_DUTY_MAX-SECOND_SAIL_DUTY_MIN)*(val/255.0)+SECOND_SAIL_DUTY_MIN
 								);
 			break;
 		}
 		case DEVICE_ID_HELM:
-			printf("Received Helm=%f\n", ConvertToHelmValue(ev.data));
+		{
+			float val = ConvertToHelmValue(ev.data);
+			printf("Received Helm=%f\n", val);
+			pwmHelm->SetDuty(
+								(HELM_DUTY_MAX-HELM_DUTY_MIN)*(val+45.0)/90.0+HELM_DUTY_MIN
+								);
 			break;
-
+		}
 		default:
 			printf("Received unhandled device value");
 			break;
@@ -49,9 +54,9 @@ void SocketHandleReceivedEvent(struct Event ev){
 
 int main(int argc, char const *argv[])
 {
-	pwmMainSail = new Pwm(PWM1A, ".10", 20000000, 1000000);
-	pwmSecondSail = new Pwm(PWM1B, ".11", 20000000, 1000000);
-	pwmHelm = new Pwm(PWM2A, ".12", 20000000, 1000000);
+	pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
+	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
+	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
 
 	int error = SocketInit();

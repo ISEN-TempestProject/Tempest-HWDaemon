@@ -12,7 +12,7 @@
 class Pwm{
 
 public:
-	Pwm(const std::string& pin, const std::string& suffix, long periodNS, long dutyNS);
+	Pwm(const std::string& pin, long periodNS, long dutyNS);
 	~Pwm();
 
 	void SetPolarity(bool state);
@@ -23,9 +23,11 @@ public:
 
 private:
 	std::string m_sPin;
+	std::string m_sPinPath;
 	std::ofstream m_files[3];
 
-	static bool m_bCapeInit;
+	static std::string m_sCapePath;
+	static std::string m_sOCPPath;
 };
 
 

@@ -4,29 +4,48 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 using namespace std;
 
-bool Pwm::m_bCapeInit = false;
+string Pwm::m_sCapePath("");
+string Pwm::m_sOCPPath("");
 
 
+string FindDirContaining(const string& sParent, const string& sName){
+	DIR* dir = opendir(sParent.c_str());
+	if(dir==nullptr)
+		return "";
 
-Pwm::Pwm(const string& pin, const string& suffix, long periodNS, long dutyNS){
-	m_sPin = pin;
-	if(!m_bCapeInit){
-		system("echo am33xx_pwm > /sys/devices/bone_capemgr.8/slots");
-		m_bCapeInit = true;
+	struct dirent* file;
+	while ((file = readdir(dir)) != nullptr){
+		if(string(file->d_name).find(sName)!=string::npos)
+			return sParent+"/"+file->d_name;
 	}
-	//Activate pwm
-	system(string("echo bone_pwm_"+m_sPin+" > /sys/devices/bone_capemgr.8/slots").c_str());
+	closedir(dir);
+	return "";
+}
 
-	m_files[0].open(string("/sys/devices/ocp.3/pwm_test_"+m_sPin+suffix+"/polarity"), ios_base::out);
-	m_files[1].open(string("/sys/devices/ocp.3/pwm_test_"+m_sPin+suffix+"/period"), ios_base::out);
-	m_files[2].open(string("/sys/devices/ocp.3/pwm_test_"+m_sPin+suffix+"/duty"), ios_base::out);
+
+Pwm::Pwm(const string& pin, long periodNS, long dutyNS){
+	m_sPin = pin;
+	if(m_sCapePath==""){
+		m_sCapePath = FindDirContaining("/sys/devices", "bone_capemgr");
+		system(string("echo am33xx_pwm > "+m_sCapePath+"/slots").c_str());
+
+		m_sOCPPath = FindDirContaining("/sys/devices", "ocp");
+	}
+	//Activate pwm on pin
+	system(string("echo bone_pwm_"+m_sPin+" > "+m_sCapePath+"/slots").c_str());
+
+	m_sPinPath = FindDirContaining(m_sOCPPath, "pwm_test_"+m_sPin);
+
+	m_files[0].open(string(m_sPinPath+"/polarity"), ios_base::out);
+	m_files[1].open(string(m_sPinPath+"/period"), ios_base::out);
+	m_files[2].open(string(m_sPinPath+"/duty"), ios_base::out);
 
 	if(m_files[0].is_open()+m_files[1].is_open()+m_files[2].is_open()<3)
-		cout<<"Error: Some PWM files could not be opened (pin="<<m_sPin+suffix<<") "<<endl;
-
+		cout<<"Error: Some PWM files could not be opened (pinpath="<<m_sPinPath<<") "<<endl;
 
 	SetPolarity(0);
 	SetPeriod(periodNS);

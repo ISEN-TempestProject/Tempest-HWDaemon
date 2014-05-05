@@ -8,6 +8,7 @@ extern "C"{
 
 #include "Pwm.hpp"
 #include "Adc.hpp"
+#include "GpsHandler.h"
 
 
 Pwm* pwmMainSail;
@@ -61,6 +62,9 @@ int main(int argc, char const *argv[])
 
 	Adc adc(0);
 
+	GpsHandler *gps;
+	gps = GpsHandler::get();
+
 
 	int error = SocketInit();
 	if(error==0){
@@ -74,8 +78,8 @@ int main(int argc, char const *argv[])
 			float value, lat, lon;
 			switch(rand()%6){
 				case 0:
-					lat = 12.3456 + rand()%20;
-					lon = 13.37 + rand()%20;
+					lat = gps->latitude();
+					lon = gps->longitude();
 					printf("Sending GPS=(%f,%f)\n", lat, lon);
 					SocketSendGps(lat, lon);
 					break;

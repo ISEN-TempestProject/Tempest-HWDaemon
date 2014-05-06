@@ -22,7 +22,6 @@ Adc::Adc(unsigned short adc){
 	}
 
 	string sPinPath = FindDirContaining(m_sOCPPath, "helper")+"/AIN"+char(0x30+adc);
-	cout<<sPinPath<<endl;
 	m_pin.open(sPinPath);
 	if(!m_pin.is_open())
 		cout<<"Error: ADC file could not be opened (pinpath="<<sPinPath<<") "<<endl;

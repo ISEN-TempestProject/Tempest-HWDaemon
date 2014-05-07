@@ -1,0 +1,3 @@
+[submodule "libgps"]
+	path = libgps
+	url = http://git.savannah.gnu.org/r/gpsd.git

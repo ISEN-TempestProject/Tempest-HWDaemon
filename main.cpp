@@ -30,6 +30,9 @@ void SocketHandleReceivedEvent(struct Event ev){
 		{
 			unsigned short val = ConvertToSailValue(ev.data);
 			printf("Received Sail=%d\n", val);
+
+			if(val>255)			val=255;
+
 			pwmMainSail->SetDuty(
 								(MAIN_SAIL_DUTY_MAX-MAIN_SAIL_DUTY_MIN)*(val/255.0)+MAIN_SAIL_DUTY_MIN
 								);
@@ -42,6 +45,10 @@ void SocketHandleReceivedEvent(struct Event ev){
 		{
 			float val = ConvertToHelmValue(ev.data);
 			printf("Received Helm=%f\n", val);
+
+			if(val<-45.0)		val=-45.0;
+			else if(val>45.0)	val=45.0;
+
 			pwmHelm->SetDuty(
 								(HELM_DUTY_MAX-HELM_DUTY_MIN)*(val+45.0)/90.0+HELM_DUTY_MIN
 								);

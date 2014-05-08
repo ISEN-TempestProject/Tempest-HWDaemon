@@ -34,12 +34,12 @@
             /*
             *   Get latitude from Gps
             */
-            float latitude();
+            double latitude();
 
             /*
             *   Get longitude from Gps
             */
-            float longitude();
+            double longitude();
 
             void acquire();
 

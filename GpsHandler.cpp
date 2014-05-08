@@ -48,11 +48,11 @@ using namespace std;
     }
 
 
-    float GpsHandler::latitude(){
+    double GpsHandler::latitude(){
         return _gps->m_gpsdata->fix.latitude;
     }
 
-    float GpsHandler::longitude(){
+    double GpsHandler::longitude(){
         return _gps->m_gpsdata->fix.longitude;
     }
 

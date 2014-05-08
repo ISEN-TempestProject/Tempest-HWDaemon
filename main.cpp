@@ -90,12 +90,13 @@ int main(int argc, char const *argv[])
 		while(running){
 
 			//Envoi d'un evenement au hasard
-			float value, lat, lon;
+			float value;
+			double lat, lon;
 			switch(rand()%6){
 				case 0:
                     lat = gps->latitude();
                     lon = gps->longitude();
-                    printf("Sending GPS=(%f,%f)\n", lat, lon);
+                    printf("Sending GPS=(%.15f,%.15f)\n", lat, lon);
 					SocketSendGps(lat, lon);
 					break;
 				/*case 1:

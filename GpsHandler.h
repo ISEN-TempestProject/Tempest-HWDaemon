@@ -7,6 +7,7 @@
     #include <string>
     #include <unistd.h>
 	#include <libgpsmm.h>
+	#include <math.h>
 
 
     class GpsHandler

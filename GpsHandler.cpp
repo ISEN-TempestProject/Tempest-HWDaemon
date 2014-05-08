@@ -75,9 +75,11 @@ using namespace std;
 
     void GpsHandler::lock(){
         cout << "Locking GPS..." << endl;
-        while(!m_gpsrec->waiting(50000000))
+        m_gpsdata = m_gpsrec->read();
+        while(!m_gpsrec->waiting(50000000) || isnan(_gps->m_gpsdata->fix.longitude) || isnan(_gps->m_gpsdata->fix.latitude) )
         {
-            cout << "Failed to lock GPS. Retrying..." << endl;
+            cout << "Waiting for GPS locking..." << endl;
+            m_gpsdata = m_gpsrec->read();
         }
         cout << "GPS locked !" << endl;
     }

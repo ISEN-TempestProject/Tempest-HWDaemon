@@ -23,8 +23,6 @@ Pwm* pwmHelm;
 
 
 void SocketHandleReceivedEvent(struct Event ev){
-	printf("\e[2mVOUS DEVEZ REECRIRE %s DANS %s:%d\e[m\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
-
 	switch(ev.id){
 		case DEVICE_ID_SAIL:
 		{

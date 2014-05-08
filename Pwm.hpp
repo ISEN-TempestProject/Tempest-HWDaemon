@@ -21,10 +21,12 @@ public:
 
 	void SetDuty(long timeNS);
 
+	void SetRun(bool bRun);
+
 private:
 	std::string m_sPin;
 	std::string m_sPinPath;
-	std::ofstream m_files[3];
+	std::ofstream m_files[4];
 
 	static std::string m_sCapePath;
 	static std::string m_sOCPPath;

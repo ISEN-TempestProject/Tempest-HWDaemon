@@ -40,6 +40,10 @@
 			<Add option="-lpthread" />
 			<Add option="-lm" />
 		</Linker>
+		<Unit filename="Accelerometer.cpp" />
+		<Unit filename="Accelerometer.hpp" />
+		<Unit filename="Adc.cpp" />
+		<Unit filename="Adc.hpp" />
 		<Unit filename="Pwm.cpp" />
 		<Unit filename="Pwm.hpp" />
 		<Unit filename="main.cpp" />
@@ -47,6 +51,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="socket.h" />
+		<Unit filename="utils.cpp" />
+		<Unit filename="utils.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

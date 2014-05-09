@@ -8,6 +8,7 @@ extern "C"{
 
 #include "Pwm.hpp"
 #include "Adc.hpp"
+#include "Accelerometer.hpp"
 
 
 Pwm* pwmMainSail;
@@ -60,6 +61,8 @@ int main(int argc, char const *argv[])
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
 	Adc adc(0);
+
+	Accelerometer acc(0,1,2);
 
 
 	int error = SocketInit();

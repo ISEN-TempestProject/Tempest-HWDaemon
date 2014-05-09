@@ -76,18 +76,18 @@ int main(int argc, char const *argv[])
 			//Envoi d'un evenement au hasard
 			float value, lat, lon;
 			switch(rand()%6){
-				case 0:
-					lat = 12.3456 + rand()%20;
-					lon = 13.37 + rand()%20;
+				/*case 0:
+					lat = gps->latitude();
+					lon = gps->longitude();
 					printf("Sending GPS=(%f,%f)\n", lat, lon);
 					SocketSendGps(lat, lon);
-					break;
+					break;*/
 				case 1:
 					value = 23.254 + rand()%20;
 					printf("Sending Roll=%f\n", value);
 					SocketSendRoll(value);
 					break;
-				case 2:
+				/*case 2:
 					value = 90.3456 + rand()%20;
 					printf("Sending WindDir=%f\n", value);
 					SocketSendWindDir(value);
@@ -96,12 +96,13 @@ int main(int argc, char const *argv[])
 					value = 12.3456 + rand()%20;
 					printf("Sending Compass=%f\n", value);
 					SocketSendCompass(value);
-					break;
+					break;*/
 			}
 
-			printf("%d\n", adc.Get());
+			printf("%d\n", adc.GetValue());
 
-			usleep(100000*(rand()%10+5));
+			//usleep(100000*(rand()%10+5));
+			usleep(1000000);
 		}
 		SocketClose();
 	}

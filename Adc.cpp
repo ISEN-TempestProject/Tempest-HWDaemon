@@ -32,9 +32,9 @@ Adc::~Adc(){
 }
 
 
-int Adc::Get(){
+float Adc::GetValue(){
 	int ret;
 	m_pin.seekg(0);
 	m_pin>>ret;
-	return ret;
+	return ret/4095.0;
 }

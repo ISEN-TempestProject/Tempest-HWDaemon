@@ -60,9 +60,13 @@ int main(int argc, char const *argv[])
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
-	Adc adc(0);
+
 
 	Accelerometer acc(0,1,2);
+
+	Adc adcBattery(3);
+	float fLastBatteryValue(0);
+
 
 
 	int error = SocketInit();
@@ -99,7 +103,13 @@ int main(int argc, char const *argv[])
 					break;*/
 			}
 
-			printf("%d\n", adc.GetValue());
+			float fBattery = adcBattery.GetValue()*0.163472875;//voltage*R1/(R1+R2) = adcval*1.8*909/(909+9100)
+			if(fabs(fBattery-fLastBatteryValue)>0.05)
+			{
+				printf("Sending Battery=%f\n", fBattery);
+				SocketSendBattery(fBattery);
+				fLastBatteryValue = fBattery;
+			}
 
 			//usleep(100000*(rand()%10+5));
 			usleep(1000000);

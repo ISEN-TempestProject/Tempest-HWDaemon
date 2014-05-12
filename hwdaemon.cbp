@@ -49,6 +49,11 @@
 		<Unit filename="Adc.hpp" />
 		<Unit filename="Pwm.cpp" />
 		<Unit filename="Pwm.hpp" />
+		<Unit filename="compass.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="compass.h" />
+		<Unit filename="i2c-dev.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="socket.c">
 			<Option compilerVar="CC" />

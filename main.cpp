@@ -4,6 +4,7 @@
 
 extern "C"{
 	#include "socket.h"
+	#include "compass.h"
 }
 
 #include "Pwm.hpp"

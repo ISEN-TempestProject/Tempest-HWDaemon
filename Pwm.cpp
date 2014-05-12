@@ -29,13 +29,15 @@ Pwm::Pwm(const string& pin, long periodNS, long dutyNS){
 	m_files[0].open(string(m_sPinPath+"/polarity"), ios_base::out);
 	m_files[1].open(string(m_sPinPath+"/period"), ios_base::out);
 	m_files[2].open(string(m_sPinPath+"/duty"), ios_base::out);
+	m_files[3].open(string(m_sPinPath+"/run"), ios_base::out);
 
 	if(m_files[0].is_open()+m_files[1].is_open()+m_files[2].is_open()<3)
 		cout<<"Error: Some PWM files could not be opened (pinpath="<<m_sPinPath<<") "<<endl;
 
-	SetPolarity(0);
 	SetPeriod(periodNS);
+	SetPolarity(0);
 	SetDuty(dutyNS);
+	SetRun(true);
 }
 
 Pwm::~Pwm(){
@@ -57,4 +59,9 @@ void Pwm::SetDuty(long timeNS){
 	//system("echo "+std::to_string(timeNS)+" > /sys/devices/ocp.3/pwm_test_"+m_sPin+"/duty");
 	m_files[2]<<timeNS;
 	m_files[2].flush();
+}
+void Pwm::SetRun(bool bRun){
+	//system("echo "+std::to_string(timeNS)+" > /sys/devices/ocp.3/pwm_test_"+m_sPin+"/duty");
+	m_files[3]<<(int)bRun;
+	m_files[3].flush();
 }

@@ -18,13 +18,10 @@ public:
 	float roll();
 	float pitch();
 
-	void toast();
-
-
-
-
 private:
 	Adc adc_x, adc_y, adc_z;
+	static float constexpr scaling = 6/1.8;
+	static float constexpr offset = -3;
 
 };
 

@@ -86,8 +86,8 @@ int main(int argc, char const *argv[])
 					printf("Sending GPS=(%f,%f)\n", lat, lon);
 					SocketSendGps(lat, lon);
 					break;*/
-				case 1:
-					value = 23.254 + rand()%20;
+				default:
+				    value = acc.roll();
 					printf("Sending Roll=%f\n", value);
 					SocketSendRoll(value);
 					break;
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
 					break;*/
 			}
 
-			float fBattery = adcBattery.GetValue()*0.163472875;//voltage*R1/(R1+R2) = adcval*1.8*909/(909+9100)
+			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)
 			if(fabs(fBattery-fLastBatteryValue)>0.05)
 			{
 				printf("Sending Battery=%f\n", fBattery);
@@ -112,7 +112,7 @@ int main(int argc, char const *argv[])
 			}
 
 			//usleep(100000*(rand()%10+5));
-			usleep(1000000);
+			usleep(100000);
 		}
 		SocketClose();
 	}

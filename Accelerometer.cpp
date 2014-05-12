@@ -15,12 +15,12 @@ float Accelerometer::roll()
     float x, y, z, roll;
 
     //Get 3-axis gravity
-    x = adc_x.GetValue();
-    y = adc_y.GetValue();
-    z = adc_z.GetValue();
+    x = adc_x.GetValue() * scaling + offset;
+    y = adc_y.GetValue() * scaling + offset;
+    z = adc_z.GetValue() * scaling + offset;
 
     //Get roll
-    roll = (atan2(y, sqrt(x*x + z*z)) * 180.0) / PI;
+    roll = atan(y / sqrt(x*x + z*z)) * (180.0 / PI);
 
     return roll;
 
@@ -31,26 +31,13 @@ float Accelerometer::pitch()
     float x, y, z, pitch;
 
     //Get 3-axis gravity
-    x = adc_x.GetValue();
-    y = adc_y.GetValue();
-    z = adc_z.GetValue();
+    x = adc_x.GetValue() * scaling + offset;
+    y = adc_y.GetValue() * scaling + offset;
+    z = adc_z.GetValue() * scaling + offset;
 
     //Get pitch
-    pitch = ((x / sqrt(y*y + z*z)) * 180.0) / PI;
+    pitch = atan(x / sqrt(y*y + z*z)) * (180.0 / PI);
 
     return pitch;
 
-}
-
-//DEBUG
-void Accelerometer::toast()
-{
-    float x, y, z, roll;
-
-    //Get 3-axis gravity
-    x = adc_x.GetValue();
-    y = adc_y.GetValue();
-    z = adc_z.GetValue();
-
-    std::cout << x << ";" << y << ";" << z << std::endl;
 }

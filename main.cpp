@@ -82,13 +82,13 @@ int main(int argc, char const *argv[])
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
-
+	InitCompass();
 
 	Accelerometer acc(0,1,2);
 
 	GpsHandler *gps;
 	gps = GpsHandler::get();
-	
+
 	Adc adcBattery(3);
 	float fLastBatteryValue(0);
 
@@ -136,6 +136,9 @@ int main(int argc, char const *argv[])
 				SocketSendBattery(fBattery);
 				fLastBatteryValue = fBattery;
 			}
+
+			printf("COMPASS = %f\n", GetCompass());
+
 			usleep(100000*(rand()%10+5));
 		}
 		SocketClose();

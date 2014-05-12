@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
+#define PI 3.14159265
 
 #define CRA 0x00
 #define CRB 0x01
@@ -19,12 +20,18 @@
 #include "i2c-dev.h"
 
 
+short int initialize(int i2c_bus, int adresse);
+short int writeMode(int file);
+short int writeRegA(int file);
+short int writeRegB(int file);
+short int readX(int file);
+short int readY(int file);
+short int readZ(int file);
+short int zero(int file);
 
 short int XOUT_offset = 0;
 short int YOUT_offset = 0;
 short int ZOUT_offset = 0;
-
-
 
 
 short int initialize(int i2c_bus, int adresse){
@@ -47,20 +54,17 @@ short int initialize(int i2c_bus, int adresse){
 
 short int writeMode(int file){
 
-	short int data=0;
-	data = i2c_smbus_write_byte_data(file, MODE, 0x00);
+	i2c_smbus_write_byte_data(file, MODE, 0x00);
 	return 0;
 }
 
 short int writeRegA(int file){
-	short int data=0;
-	data = i2c_smbus_write_byte_data(file, CRA, 0x70);
+	i2c_smbus_write_byte_data(file, CRA, 0x70);
 	return 0;
 }
 
 short int writeRegB(int file){
-	short int data=0;
-	data = i2c_smbus_write_byte_data(file, CRB, 0xa0);
+	i2c_smbus_write_byte_data(file, CRB, 0xa0);
 	return 0;
 }
 
@@ -100,4 +104,61 @@ short int zero(int file){
 	XOUT_offset = readX(file);
 	YOUT_offset = readY(file);
 	ZOUT_offset = readZ(file);
+	return 0;//TODO ??
 }
+
+
+
+
+
+
+
+
+
+
+
+char *end;
+int i2c_bus, adresse, dadresse, size, file;
+
+double angle;
+
+
+
+void InitCompass()
+{
+	system("echo BB-I2C1 > /sys/devices/bone_capemgr.8/slots");
+
+	i2c_bus = 1;
+	adresse = 0x1e;
+	file = initialize(i2c_bus, adresse);
+	zero(file);
+}
+
+
+float GetCompass()
+{
+	short x, y, z;
+
+	writeRegA(file);
+	writeRegB(file);
+	writeMode(file);
+
+	x = readX(file);
+	y = readY(file);
+	z = readZ(file);
+
+	angle = atan2((double)y,(double)x); //calcul du cap
+
+	float declinationAngle = 0.0457;
+	angle += declinationAngle;
+
+	if (angle <0){   //correction du signe
+		angle += 2*PI;
+	}
+	else if(angle > 2*PI){
+		angle -= 2*PI;
+	}
+
+	return angle*(180/PI);
+}
+

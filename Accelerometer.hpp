@@ -22,6 +22,7 @@ private:
 	Adc adc_x, adc_y, adc_z;
 	static float constexpr scaling = 6/1.8;
 	static float constexpr offset = -3;
+	static float constexpr biasCorrection = -0.100;
 
 };
 

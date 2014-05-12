@@ -147,7 +147,7 @@ int main(int argc, char const *argv[])
 		printf("Unable to init socket ! Error code %d",error);
 	}
 
-    	gps->kill();
+    gps->kill();
 	delete pwmHelm;
 	delete pwmMainSail;
 	delete pwmSecondSail;

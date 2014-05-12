@@ -6,9 +6,10 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <pthread.h>
+#include <unistd.h>
 
 struct sockaddr_un addressServer;
-int socketClient, socketServer;
+int socketClient=-1, socketServer=-1;
 pthread_t thread;
 int term;
 
@@ -46,7 +47,7 @@ void* SocketThread(){
 
 int SocketHandleClients(){
 	term = 0;
-	int created = pthread_create(&thread, NULL, SocketThread, NULL);
+int created = pthread_create(&thread, NULL, SocketThread, NULL);
 	if(created<0){
 		printf("Unable to start socket thread");
 		return created;
@@ -55,8 +56,13 @@ int SocketHandleClients(){
 }
 
 void SocketClose(){
+    if(socketClient>=0)
+        close(socketClient);
+    if(socketServer>=0)
+        close(socketServer);
+
 	if(thread!=0){
-		close(socketClient);
+
 		term = 1;
 		pthread_join(thread, NULL);
 	}

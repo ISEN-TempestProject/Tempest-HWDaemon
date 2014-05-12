@@ -25,15 +25,27 @@
 				<Option object_output="obj/Beagle/" />
 				<Option type="1" />
 				<Option compiler="gcc_c_cross_beaglebone" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="0" />
+				<Option projectResourceIncludeDirsRelation="0" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add directory="/opt/libgps/includes" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
+					<Add option="-rpath=&apos;/opt/libgps&apos;" />
+					<Add directory="/opt/libgps" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="cp ${TARGET_OUTPUT_FILE} /tmp/sshfs" />
 				</ExtraCommands>
+				<MakeCommands>
+					<Build command="" />
+					<CompileFile command="" />
+					<Clean command="" />
+					<DistClean command="" />
+					<AskRebuildNeeded command="" />
+					<SilentBuild command=" &gt; $(CMD_NULL)" />
+				</MakeCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -44,6 +56,8 @@
 		<Linker>
 			<Add option="-lpthread" />
 			<Add option="-lm" />
+			<Add option="-lgps" />
+			<Add option="-ldbus-1" />
 		</Linker>
 		<Unit filename="Adc.cpp" />
 		<Unit filename="Adc.hpp" />

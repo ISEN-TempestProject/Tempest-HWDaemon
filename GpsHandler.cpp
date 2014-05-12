@@ -2,94 +2,113 @@
 
 using namespace std;
 
-    
+
     GpsHandler::GpsHandler(){
         init();
-        //lock();
-    
     }
-    
+
     GpsHandler::~GpsHandler(){
-        kill();
         close();
     }
-    
+
 
     GpsHandler *GpsHandler::get()
     {
         if(_gps == NULL)
         {
             _gps = new GpsHandler();
+            _gps->lock();
             _gps->start();
-            cout << "Plop" << endl;
         }
         return _gps;
     }
-    
+
     void GpsHandler::kill()
     {
+
         if (NULL != _gps)
         {
+            cout << "Killing GPS..." << endl;
             _gps->stop();
             delete _gps;
             _gps = NULL;
+            cout << "GPS killed !" << endl;
         }
     }
-    
+
     void GpsHandler::start(){
-        t_acquire = new thread(&GpsHandler::acquire, this);
-    }
-    
-    void GpsHandler::stop(){
-        m_acquire = false;
-        t_acquire->join();
+        pthread_create(&t_acquire, NULL, acquireWrapper, this);
     }
 
-    
-    float GpsHandler::latitude(){
+    void GpsHandler::stop(){
+        cout << "Stopping GPS thread..." << endl;
+        m_acquire = false;
+        pthread_join(t_acquire, NULL);
+        cout << "GPS thread stopped !" << endl;
+    }
+
+
+    double GpsHandler::latitude(){
         return _gps->m_gpsdata->fix.latitude;
     }
-    
-    float GpsHandler::longitude(){
+
+    double GpsHandler::longitude(){
         return _gps->m_gpsdata->fix.longitude;
     }
 
-    
+
     void GpsHandler::init(){
         string host = "localhost";
         string port = "2947";
         cout << "Trying to connect to " << host << ":" << port << endl;
         m_gpsrec = new gpsmm((char*) host.c_str(),(char*) port.c_str());
-        
-        
+
+
         //connect to local GPSd
         if((m_gpsdata = m_gpsrec->stream(WATCH_ENABLE | WATCH_JSON)) == NULL ){
             cerr << "No GPSd running." << endl;
             exit(-1);
         }
-        
+
         cout << "Gpsd Running" << endl;
     }
-    
+
+    void GpsHandler::lock(){
+        cout << "Locking GPS..." << endl;
+        m_gpsdata = m_gpsrec->read();
+        while(!m_gpsrec->waiting(50000000) || isnan(_gps->m_gpsdata->fix.longitude) || isnan(_gps->m_gpsdata->fix.latitude) )
+        {
+            cout << "Waiting for GPS locking..." << endl;
+            m_gpsdata = m_gpsrec->read();
+        }
+        cout << "GPS locked !" << endl;
+    }
+
     void GpsHandler::acquire(){
         m_acquire= true;
         while(m_acquire)
         {
             //wait for some data
             if (!m_gpsrec->waiting(50000000)){
+                cout << "Continue..." << endl;
                 continue;
             }
             if ((m_gpsdata = m_gpsrec->read()) == NULL) {
                 cerr << "Read error.\n" << endl;
                 return;
             }
-            cout<<"plop"<<endl;
+            pthread_yield();
         }
     }
-    
+
     void GpsHandler::close(){
        m_gpsdata = m_gpsrec->stream(WATCH_DISABLE);
         //gps_close(m_gpsdata);
     }
-    
+
 GpsHandler *GpsHandler::_gps = NULL;
+
+void* acquireWrapper(void* obj){
+    GpsHandler* ctrl = reinterpret_cast<GpsHandler*>(obj);
+    ctrl->acquire();
+}

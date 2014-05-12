@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 
 extern "C"{
 	#include "socket.h"
@@ -9,6 +11,8 @@ extern "C"{
 #include "Pwm.hpp"
 #include "Adc.hpp"
 #include "GpsHandler.h"
+
+bool running = true;
 
 
 Pwm* pwmMainSail;
@@ -27,7 +31,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 	printf("\e[2mVOUS DEVEZ REECRIRE %s DANS %s:%d\e[m\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
 	switch(ev.id){
-		case DEVICE_ID_SAIL:
+		/*case DEVICE_ID_SAIL:
 		{
 			unsigned short val = ConvertToSailValue(ev.data);
 			printf("Received Sail=%d\n", val);
@@ -47,20 +51,31 @@ void SocketHandleReceivedEvent(struct Event ev){
 								(HELM_DUTY_MAX-HELM_DUTY_MIN)*(val+45.0)/90.0+HELM_DUTY_MIN
 								);
 			break;
-		}
+		}*/
 		default:
 			printf("Received unhandled device value");
 			break;
 	}
 }
 
+void term(int signum)
+{
+    printf("Received SIGINT, exiting...\n");
+    running = false;
+}
+
 int main(int argc, char const *argv[])
 {
-	pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
+    struct sigaction action;
+    memset(&action, 0, sizeof(struct sigaction));
+    action.sa_handler = term;
+    sigaction(SIGINT, &action, NULL);
+
+	/*pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
-	Adc adc(0);
+	Adc adc(0);*/
 
 	GpsHandler *gps;
 	gps = GpsHandler::get();
@@ -72,15 +87,16 @@ int main(int argc, char const *argv[])
 		SocketHandleClients();
 
 		//Boucle principale du programme
-		while(1){
+		while(running){
 
 			//Envoi d'un evenement au hasard
-			float value, lat, lon;
+			float value;
+			double lat, lon;
 			switch(rand()%6){
 				case 0:
-					lat = gps->latitude();
-					lon = gps->longitude();
-					printf("Sending GPS=(%f,%f)\n", lat, lon);
+                    lat = gps->latitude();
+                    lon = gps->longitude();
+                    printf("Sending GPS=(%.15f,%.15f)\n", lat, lon);
 					SocketSendGps(lat, lon);
 					break;
 				case 1:
@@ -100,8 +116,6 @@ int main(int argc, char const *argv[])
 					break;
 			}
 
-			printf("%d\n", adc.Get());
-
 			usleep(100000*(rand()%10+5));
 		}
 		SocketClose();
@@ -110,7 +124,7 @@ int main(int argc, char const *argv[])
 		printf("Unable to init socket ! Error code %d",error);
 	}
 
-
+    	gps->kill();
 	delete pwmHelm;
 	delete pwmMainSail;
 	delete pwmSecondSail;

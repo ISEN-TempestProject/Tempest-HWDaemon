@@ -9,7 +9,10 @@ public:
 	Adc(unsigned short adc);
 	~Adc();
 
-	int Get();
+	/**
+		@brief Returns the value of the ADC between 0 and 1 (for 0v to 1.8v)
+	**/
+	float GetValue();
 
 
 

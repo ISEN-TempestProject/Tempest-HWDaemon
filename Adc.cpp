@@ -32,9 +32,9 @@ Adc::~Adc(){
 }
 
 
-int Adc::Get(){
+float Adc::GetValue(){
 	int ret;
 	m_pin.seekg(0);
 	m_pin>>ret;
-	return ret;
+	return ret/1000.0; //The beaglebone gives us the value in millivolts (0->1.8V are 0->1799)
 }

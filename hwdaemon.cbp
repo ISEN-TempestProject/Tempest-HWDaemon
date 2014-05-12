@@ -63,6 +63,8 @@
 		<Unit filename="Adc.hpp" />
 		<Unit filename="GpsHandler.cpp" />
 		<Unit filename="GpsHandler.h" />
+		<Unit filename="Accelerometer.cpp" />
+		<Unit filename="Accelerometer.hpp" />
 		<Unit filename="Pwm.cpp" />
 		<Unit filename="Pwm.hpp" />
 		<Unit filename="main.cpp" />

@@ -11,6 +11,7 @@ extern "C"{
 #include "Pwm.hpp"
 #include "Adc.hpp"
 #include "GpsHandler.h"
+#include "Accelerometer.hpp"
 
 bool running = true;
 
@@ -31,7 +32,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 	printf("\e[2mVOUS DEVEZ REECRIRE %s DANS %s:%d\e[m\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
 	switch(ev.id){
-		/*case DEVICE_ID_SAIL:
+		case DEVICE_ID_SAIL:
 		{
 			unsigned short val = ConvertToSailValue(ev.data);
 			printf("Received Sail=%d\n", val);
@@ -51,7 +52,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 								(HELM_DUTY_MAX-HELM_DUTY_MIN)*(val+45.0)/90.0+HELM_DUTY_MIN
 								);
 			break;
-		}*/
+		}
 		default:
 			printf("Received unhandled device value");
 			break;
@@ -71,14 +72,20 @@ int main(int argc, char const *argv[])
     action.sa_handler = term;
     sigaction(SIGINT, &action, NULL);
 
-	/*pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
+	pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
-	Adc adc(0);*/
+
+
+	Accelerometer acc(0,1,2);
 
 	GpsHandler *gps;
 	gps = GpsHandler::get();
+	
+	Adc adcBattery(3);
+	float fLastBatteryValue(0);
+
 
 
 	int error = SocketInit();
@@ -116,6 +123,13 @@ int main(int argc, char const *argv[])
 					break;
 			}
 
+			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)
+			if(fabs(fBattery-fLastBatteryValue)>0.05)
+			{
+				printf("Sending Battery=%f\n", fBattery);
+				SocketSendBattery(fBattery);
+				fLastBatteryValue = fBattery;
+			}
 			usleep(100000*(rand()%10+5));
 		}
 		SocketClose();

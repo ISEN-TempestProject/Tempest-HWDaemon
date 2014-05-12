@@ -79,5 +79,10 @@ void SocketSendWindDir(double angle);
 */
 void SocketSendCompass(double angle);
 
+/**
+	@arg voltage Entre 0 et 18 volts
+**/
+void SocketSendBattery(float voltage);
+
 
 #endif

@@ -147,6 +147,14 @@ void SocketSendCompass(double angle){
 	ev.data[1] = 0;
 	SocketSendEvent(ev);
 }
+void SocketSendBattery(float voltage){
+	//voltage 0 : 18
+	struct Event ev;
+	ev.id = DEVICE_ID_COMPASS;
+	ev.data[0] = (uint64_t)((voltage)*UINT64_MAX/18.0);;
+	ev.data[1] = 0;
+	SocketSendEvent(ev);
+}
 
 
 

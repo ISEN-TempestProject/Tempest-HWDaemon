@@ -33,7 +33,7 @@ float Accelerometer::pitch()
     //Get 3-axis gravity
     x = adc_x.GetValue() * scaling + offset;
     y = adc_y.GetValue() * scaling + offset;
-    z = adc_z.GetValue() * scaling + offset;
+    z = (adc_z.GetValue() + biasCorrection) * scaling + offset;
 
     //Get pitch
     pitch = atan(x / sqrt(y*y + z*z)) * (180.0 / PI);

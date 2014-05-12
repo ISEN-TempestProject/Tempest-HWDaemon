@@ -106,9 +106,12 @@ using namespace std;
         //gps_close(m_gpsdata);
     }
 
+
+
 GpsHandler *GpsHandler::_gps = NULL;
 
 void* acquireWrapper(void* obj){
     GpsHandler* ctrl = reinterpret_cast<GpsHandler*>(obj);
     ctrl->acquire();
+    return nullptr;
 }

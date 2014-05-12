@@ -88,7 +88,7 @@ int main(int argc, char const *argv[])
 
 	GpsHandler *gps;
 	gps = GpsHandler::get();
-	
+
 	Adc adcBattery(3);
 	float fLastBatteryValue(0);
 
@@ -144,7 +144,7 @@ int main(int argc, char const *argv[])
 		printf("Unable to init socket ! Error code %d",error);
 	}
 
-    	gps->kill();
+    gps->kill();
 	delete pwmHelm;
 	delete pwmMainSail;
 	delete pwmSecondSail;

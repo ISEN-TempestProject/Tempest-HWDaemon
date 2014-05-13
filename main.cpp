@@ -74,93 +74,122 @@ void term(int signum)
 
 int main(int argc, char const *argv[])
 {
+	//Setup interrupt signal handling
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = term;
     sigaction(SIGINT, &action, NULL);
 
+
+    //Setup servo PWM
 	pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
 	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
 	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
 
-	InitCompass();
 
-	Accelerometer acc(0,1,2);
-
+	//Setup GPS
 	GpsHandler *gps;
 	gps = GpsHandler::get();
+	double fLastGPS[2] = {0,0};
 
+	//Setup compass
+	InitCompass();
+	float fLastCompass(0);
+
+	//Setup accelerometer (roll)
+	Accelerometer acc(0,1,2);
+	float fLastRoll(0);
+
+	//Setup wind direction
+	Gpio* gpioWind[6];//P8 pin numbers: 11 12 14 15 16 17
+	gpioWind[0] = new Gpio(45, Gpio::INPUT);
+	gpioWind[1] = new Gpio(44, Gpio::INPUT);
+	gpioWind[2] = new Gpio(26, Gpio::INPUT);
+	gpioWind[3] = new Gpio(47, Gpio::INPUT);
+	gpioWind[4] = new Gpio(46, Gpio::INPUT);
+	gpioWind[5] = new Gpio(27, Gpio::INPUT);
+	float fLastWindDir(0);
+
+	//Setup Battery probe
 	Adc adcBattery(3);
-	float fLastBatteryValue(0);
+	float fLastBattery(0);
 
-	Gpio* gpioGirouette[6];//P8 pin numbers: 11 12 14 15 16 17
-	gpioGirouette[0] = new Gpio(45, Gpio::INPUT);
-	gpioGirouette[1] = new Gpio(44, Gpio::INPUT);
-	gpioGirouette[2] = new Gpio(26, Gpio::INPUT);
-	gpioGirouette[3] = new Gpio(47, Gpio::INPUT);
-	gpioGirouette[4] = new Gpio(46, Gpio::INPUT);
-	gpioGirouette[5] = new Gpio(27, Gpio::INPUT);
-
-
+	//Init communication socket to the intelligence
 	int error = SocketInit();
 	if(error==0){
 
+		//Start client handling thread
 		SocketHandleClients();
 
-		//Boucle principale du programme
+		//Main loop
 		while(running){
 
-			//Envoi d'un evenement au hasard
-			float value;
-			double lat, lon;
-			switch(rand()%6){
-				case 0:
-                    lat = gps->latitude();
-                    lon = gps->longitude();
-                    printf("Sending GPS=(%.15f,%.15f)\n", lat, lon);
-					SocketSendGps(lat, lon);
-					break;
-				case 1:
-					value = 23.254 + rand()%20;
-					printf("Sending Roll=%f\n", value);
-					SocketSendRoll(value);
-					break;
-				case 2:
-					value = 90.3456 + rand()%20;
-					printf("Sending WindDir=%f\n", value);
-					SocketSendWindDir(value);
-					break;
-				case 3:
-					value = 12.3456 + rand()%20;
-					printf("Sending Compass=%f\n", value);
-					SocketSendCompass(value);
-					break;
+			// GPS HANDLING
+			double fGps[2] = {gps->latitude(), gps->longitude()};
+			if(fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1])
+			{
+				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
+				SocketSendGps(fGps[0], fGps[1]);
+				fLastGPS[0] = fGps[0];
+				fLastGPS[1] = fGps[1];
 			}
 
+			// COMPASS HANDLING
+			float fCompass = GetCompass();
+			if(fabs(fCompass-fLastCompass)>1)//re-send compass for each 1degree variation
+			{
+				printf("Sending Compass=%f\n", fCompass);
+				SocketSendCompass(fCompass);
+				fLastCompass = fCompass;
+			}
+
+			// ACCELEROMETER HANDLING
+			float fRoll = acc.roll();
+			if(fabs(fRoll-fLastRoll)>2)//re-send compass for each 1degree variation
+			{
+				printf("Sending Roll=%f\n", fRoll);
+				SocketSendRoll(fRoll);
+				fLastRoll = fRoll;
+			}
+
+			// WIND DIRECTION HANDLING
+			//float fWindDir = ;
+			//if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
+			//{
+			//	printf("Sending WindDir=%f\n", fWindDir);
+			//	SocketSendWindDir(fWindDir);
+			//	fLastWindDir = fWindDir;
+			//}
+
+			// BATTERY VOLTAGE HANDLING
 			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)
-			if(fabs(fBattery-fLastBatteryValue)>0.05)
+			if(fabs(fBattery-fLastBattery)>0.05)
 			{
 				printf("Sending Battery=%f\n", fBattery);
 				SocketSendBattery(fBattery);
-				fLastBatteryValue = fBattery;
+				fLastBattery = fBattery;
 			}
 
-			printf("COMPASS = %f\n", GetCompass());
-
-			usleep(100000*(rand()%10+5));
+			usleep(100000);//sleep 1/10 sec
 		}
+
+		//Close sockets
 		SocketClose();
 	}
 	else{
 		printf("Unable to init socket ! Error code %d",error);
+		return -1;
 	}
 
-	for(auto pin : gpioGirouette)
+	//Destructions
+	for(auto pin : gpioWind)
 		delete pin;
 
     gps->kill();
 	delete pwmHelm;
 	delete pwmMainSail;
 	delete pwmSecondSail;
+
+	//That's the end
 	return 0;
 }

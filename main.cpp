@@ -13,6 +13,7 @@ extern "C"{
 #include "Adc.hpp"
 #include "GpsHandler.h"
 #include "Accelerometer.hpp"
+#include "Gpio.hpp"
 
 bool running = true;
 
@@ -92,6 +93,13 @@ int main(int argc, char const *argv[])
 	Adc adcBattery(3);
 	float fLastBatteryValue(0);
 
+	Gpio* gpioGirouette[6];//P8 pin numbers: 11 12 14 15 16 17
+	gpioGirouette[0] = new Gpio(45, Gpio::INPUT);
+	gpioGirouette[1] = new Gpio(44, Gpio::INPUT);
+	gpioGirouette[2] = new Gpio(26, Gpio::INPUT);
+	gpioGirouette[3] = new Gpio(47, Gpio::INPUT);
+	gpioGirouette[4] = new Gpio(46, Gpio::INPUT);
+	gpioGirouette[5] = new Gpio(27, Gpio::INPUT);
 
 
 	int error = SocketInit();
@@ -146,6 +154,9 @@ int main(int argc, char const *argv[])
 	else{
 		printf("Unable to init socket ! Error code %d",error);
 	}
+
+	for(auto pin : gpioGirouette)
+		delete pin;
 
     gps->kill();
 	delete pwmHelm;

@@ -59,12 +59,16 @@
 			<Add option="-lgps" />
 			<Add option="-ldbus-1" />
 		</Linker>
-		<Unit filename="Adc.cpp" />
-		<Unit filename="Adc.hpp" />
-		<Unit filename="GpsHandler.cpp" />
-		<Unit filename="GpsHandler.h" />
+		<Unit filename="./Gpio.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="Accelerometer.cpp" />
 		<Unit filename="Accelerometer.hpp" />
+		<Unit filename="Adc.cpp" />
+		<Unit filename="Adc.hpp" />
+		<Unit filename="Gpio.cpp" />
+		<Unit filename="GpsHandler.cpp" />
+		<Unit filename="GpsHandler.h" />
 		<Unit filename="Pwm.cpp" />
 		<Unit filename="Pwm.hpp" />
 		<Unit filename="compass.c">

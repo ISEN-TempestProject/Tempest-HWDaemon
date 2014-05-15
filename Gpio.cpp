@@ -17,7 +17,7 @@ Gpio::Gpio(unsigned short nPin, Mode nMode){
 
 	m_pinpath = "/sys/class/gpio/gpio"+m_pin;
 
-	SetMode(INPUT);
+	SetMode(nMode);
 }
 
 Gpio::~Gpio(){
@@ -58,9 +58,8 @@ void Gpio::SetValue(bool val){
 bool Gpio::GetValue(){
 	if(m_mode==INPUT){
 		int ret;
-		m_filer>>ret;
 		m_filer.seekg(0);
-
+		m_filer>>ret;
 		return ret>0;
 	}
 	else{

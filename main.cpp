@@ -74,6 +74,7 @@ void term(int signum)
 
 int main(int argc, char const *argv[])
 {
+#ifndef UNITTEST
 	//Setup interrupt signal handling
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
@@ -153,13 +154,19 @@ int main(int argc, char const *argv[])
 			}
 
 			// WIND DIRECTION HANDLING
-			//float fWindDir = ;
-			//if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
-			//{
-			//	printf("Sending WindDir=%f\n", fWindDir);
-			//	SocketSendWindDir(fWindDir);
-			//	fLastWindDir = fWindDir;
-			//}
+			float fWindDir = ((short)gpioWind[0]->GetValue()<<5
+                     +(short)gpioWind[1]->GetValue()<<4
+                     +(short)gpioWind[2]->GetValue()<<3
+                     +(short)gpioWind[3]->GetValue()<<2
+                     +(short)gpioWind[4]->GetValue()<<1
+                     +(short)gpioWind[5]->GetValue()
+                     ) * 5.625;
+			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
+			{
+				printf("Sending WindDir=%f\n", fWindDir);
+				SocketSendWindDir(fWindDir);
+				fLastWindDir = fWindDir;
+			}
 
 			// BATTERY VOLTAGE HANDLING
 			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)
@@ -189,6 +196,18 @@ int main(int argc, char const *argv[])
 	delete pwmHelm;
 	delete pwmMainSail;
 	delete pwmSecondSail;
+
+#else
+
+    /* ==================================
+    *
+    *           UNIT TESTS
+    *
+    * ===================================*/
+
+
+
+#endif // UNITTEST
 
 	//That's the end
 	return 0;

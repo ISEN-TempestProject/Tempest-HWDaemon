@@ -17,17 +17,18 @@ extern "C"{
 
 bool running = true;
 
+#define PWM_PERIOD 20000000
 
 Pwm* pwmMainSail;
-#define MAIN_SAIL_DUTY_MIN 600000
-#define MAIN_SAIL_DUTY_MAX 2400000
+#define MAIN_SAIL_DUTY_MIN 1000000.0
+#define MAIN_SAIL_DUTY_MAX 2000000.0
 Pwm* pwmSecondSail;
-#define SECOND_SAIL_DUTY_MIN 600000
-#define SECOND_SAIL_DUTY_MAX 2400000
+#define SECOND_SAIL_DUTY_MIN 1500000.0
+#define SECOND_SAIL_DUTY_MAX 2000000.0
 
 Pwm* pwmHelm;
-#define HELM_DUTY_MIN 600000.0
-#define HELM_DUTY_MAX 2400000.0
+#define HELM_DUTY_MIN 850000.0
+#define HELM_DUTY_MAX 1950000.0
 
 
 void SocketHandleReceivedEvent(struct Event ev){
@@ -83,9 +84,9 @@ int main(int argc, char const *argv[])
 
 
     //Setup servo PWM
-	pwmMainSail = new Pwm(PWM2A, 20000000, 1000000);
-	pwmSecondSail = new Pwm(PWM2B, 20000000, 1000000);
-	pwmHelm = new Pwm(PWM1A, 20000000, 1000000);
+	pwmMainSail = new Pwm(PWM2A, PWM_PERIOD, (MAIN_SAIL_DUTY_MAX-MAIN_SAIL_DUTY_MIN)/2+MAIN_SAIL_DUTY_MIN);
+	pwmSecondSail = new Pwm(PWM2B, PWM_PERIOD, (SECOND_SAIL_DUTY_MAX-SECOND_SAIL_DUTY_MIN)/2+SECOND_SAIL_DUTY_MIN);
+	pwmHelm = new Pwm(PWM1A, PWM_PERIOD, (HELM_DUTY_MAX-HELM_DUTY_MIN)/2+HELM_DUTY_MIN);
 
 
 	//Setup GPS

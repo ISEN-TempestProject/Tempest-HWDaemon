@@ -127,7 +127,7 @@ int main(int argc, char const *argv[])
 
 			// GPS HANDLING
 			double fGps[2] = {gps->latitude(), gps->longitude()};
-			if(fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1])
+			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
 			{
 				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
 				SocketSendGps(fGps[0], fGps[1]);
@@ -154,12 +154,13 @@ int main(int argc, char const *argv[])
 			}
 
 			// WIND DIRECTION HANDLING
-			float fWindDir = ((short)gpioWind[0]->GetValue()<<5
-                     +(short)gpioWind[1]->GetValue()<<4
-                     +(short)gpioWind[2]->GetValue()<<3
-                     +(short)gpioWind[3]->GetValue()<<2
-                     +(short)gpioWind[4]->GetValue()<<1
-                     +(short)gpioWind[5]->GetValue()
+			float fWindDir = (
+					   ( 	((short)gpioWind[0]->GetValue())<<5		)
+                     + (	((short)gpioWind[1]->GetValue())<<4		)
+                     + (	((short)gpioWind[2]->GetValue())<<3		)
+                     + (	((short)gpioWind[3]->GetValue())<<2		)
+                     + (	((short)gpioWind[4]->GetValue())<<1		)
+                     + (	((short)gpioWind[5]->GetValue()	)		)
                      ) * 5.625;
 			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
 			{

@@ -142,7 +142,7 @@ int main(int argc, char const *argv[])
 			double fGps[2] = {gps->latitude(), gps->longitude()};
 			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
 			{
-				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
+//				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
 				SocketSendGps(fGps[0], fGps[1]);
 				fLastGPS[0] = fGps[0];
 				fLastGPS[1] = fGps[1];
@@ -161,33 +161,37 @@ int main(int argc, char const *argv[])
 			float fRoll = acc.roll();
 			if(fabs(fRoll-fLastRoll)>2)//re-send compass for each 1degree variation
 			{
-				printf("Sending Roll=%f\n", fRoll);
+//				printf("Sending Roll=%f\n", fRoll);
 				SocketSendRoll(fRoll);
 				fLastRoll = fRoll;
 			}
 
 			// WIND DIRECTION HANDLING
+//			short nWindDirData =
+//					   ( 	(!gpioWind[0]->GetValue())*16	)
+//                     + (	(!gpioWind[1]->GetValue())*8	)
+//                     + (	(!gpioWind[2]->GetValue())*4	)
+//                     + (	(!gpioWind[3]->GetValue())*2	)
+//                     + (	(!gpioWind[4]->GetValue())*1	);
 			short nWindDirData = //GrayToBin(
-					   ( 	((short)gpioWind[0]->GetValue())<<4		)
-                     + (	((short)gpioWind[1]->GetValue())<<3		)
-                     + (	((short)gpioWind[2]->GetValue())<<2		)
-                     + (	((short)gpioWind[3]->GetValue())<<1		)
-                     + (	((short)gpioWind[4]->GetValue())<<0		)
-//                     + (	((short)gpioWind[5]->GetValue())<<0		)
-                      ;//* 5.625;
-			char zone[32]={0,1,3,2,7,6,4,5,15,14,12,13,8,9,11,10,31,30,28,29,24,25,27,26,16,17,19,18,23,22,20,21};
-			float fWindDir = zone[nWindDirData];
-			std::cout<<fWindDir<<std::endl;
+					   ( 	(!gpioWind[0]->GetValue())*32	)
+                     + (	(!gpioWind[1]->GetValue())*16	)
+                     + (	(!gpioWind[2]->GetValue())*8	)
+                     + (	(!gpioWind[3]->GetValue())*4	)
+                     + (	(!gpioWind[4]->GetValue())*2	)
+                     + (	(!gpioWind[5]->GetValue())*1	);
 
-//			std::bitset<8> bs((int)fWindDir);
-//			std::cout << bs << std::endl;
+//			char zone[32]={0,1,3,2,7,6,4,5,15,14,12,13,8,9,11,10,31,30,28,29,24,25,27,26,16,17,19,18,23,22,20,21};
+			char zone[64]={0,1, 2,3, 6,7, 4,5, 14,15, 12,13, 8,9, 10,11, 30,31, 28,29, 24,25, 26,27, 16,17, 18,19, 22,23, 20,21, 62,63, 60,61, 56,57, 58,59, 48,49, 50,51, 54,55, 52,53, 32,33, 34,35, 38,39, 36,37, 46,47, 44,45, 40,41, 42, 43};
+			float fWindDir = zone[nWindDirData]*5.625;
+			if(fWindDir>180.0)	fWindDir-=360.0;
 
-//			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
-//			{
-//				//printf("Sending WindDir=%f\n", fWindDir);
-//				SocketSendWindDir(fWindDir);
-//				fLastWindDir = fWindDir;
-//			}
+			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
+			{
+				printf("Sending WindDir=%f\n", fWindDir);
+				SocketSendWindDir(fWindDir);
+				fLastWindDir = fWindDir;
+			}
 
 			// BATTERY VOLTAGE HANDLING
 			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)

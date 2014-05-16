@@ -31,6 +31,7 @@ void Gpio::SetMode(Mode mode){
 	m_mode = mode;
 	if(m_mode==INPUT){
 		system(("echo in > "+m_pinpath+"/direction").c_str());
+		system(("echo 1 > "+m_pinpath+"/active_low").c_str());
 
 		if(m_filew.is_open())
 			m_filew.close();
@@ -38,6 +39,7 @@ void Gpio::SetMode(Mode mode){
 	}
 	else{
 		system(("echo out > "+m_pinpath+"/direction").c_str());
+		system(("echo 0 > "+m_pinpath+"/active_low").c_str());
 
 		if(m_filer.is_open())
 			m_filer.close();

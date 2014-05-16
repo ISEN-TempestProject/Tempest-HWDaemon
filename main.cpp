@@ -73,6 +73,18 @@ void term(int signum)
     running = false;
 }
 
+unsigned short GrayToBin(unsigned short gray)//not used anymore
+{
+    unsigned short result = gray & 64;
+    result |= (gray ^ (result >> 1)) & 32;
+    result |= (gray ^ (result >> 1)) & 16;
+    result |= (gray ^ (result >> 1)) & 8;
+    result |= (gray ^ (result >> 1)) & 4;
+    result |= (gray ^ (result >> 1)) & 2;
+    result |= (gray ^ (result >> 1)) & 1;
+    return result;
+}
+
 int main(int argc, char const *argv[])
 {
 #ifndef UNITTEST
@@ -155,20 +167,27 @@ int main(int argc, char const *argv[])
 			}
 
 			// WIND DIRECTION HANDLING
-			float fWindDir = (
-					   ( 	((short)gpioWind[0]->GetValue())<<5		)
-                     + (	((short)gpioWind[1]->GetValue())<<4		)
-                     + (	((short)gpioWind[2]->GetValue())<<3		)
-                     + (	((short)gpioWind[3]->GetValue())<<2		)
-                     + (	((short)gpioWind[4]->GetValue())<<1		)
-                     + (	((short)gpioWind[5]->GetValue()	)		)
-                     ) * 5.625;
-			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
-			{
-				printf("Sending WindDir=%f\n", fWindDir);
-				SocketSendWindDir(fWindDir);
-				fLastWindDir = fWindDir;
-			}
+			short nWindDirData = //GrayToBin(
+					   ( 	((short)gpioWind[0]->GetValue())<<4		)
+                     + (	((short)gpioWind[1]->GetValue())<<3		)
+                     + (	((short)gpioWind[2]->GetValue())<<2		)
+                     + (	((short)gpioWind[3]->GetValue())<<1		)
+                     + (	((short)gpioWind[4]->GetValue())<<0		)
+//                     + (	((short)gpioWind[5]->GetValue())<<0		)
+                      ;//* 5.625;
+			char zone[32]={0,1,3,2,7,6,4,5,15,14,12,13,8,9,11,10,31,30,28,29,24,25,27,26,16,17,19,18,23,22,20,21};
+			float fWindDir = zone[nWindDirData];
+			std::cout<<fWindDir<<std::endl;
+
+//			std::bitset<8> bs((int)fWindDir);
+//			std::cout << bs << std::endl;
+
+//			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
+//			{
+//				//printf("Sending WindDir=%f\n", fWindDir);
+//				SocketSendWindDir(fWindDir);
+//				fLastWindDir = fWindDir;
+//			}
 
 			// BATTERY VOLTAGE HANDLING
 			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)

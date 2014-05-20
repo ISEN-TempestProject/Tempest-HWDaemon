@@ -10,6 +10,7 @@
 #define DEVICE_ID_ROLL 4
 #define DEVICE_ID_WINDDIR 5
 #define DEVICE_ID_COMPASS 6
+#define DEVICE_ID_BATTERY 7
 
 struct Event{
 	uint8_t id;

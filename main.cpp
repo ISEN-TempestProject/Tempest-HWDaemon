@@ -36,7 +36,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 		case DEVICE_ID_SAIL:
 		{
 			unsigned short val = ConvertToSailValue(ev.data);
-			printf("Received Sail=%d\n", val);
+			printf("\t\tReceived Sail=%d\n", val);
 
 			if(val>255)			val=255;
 
@@ -51,7 +51,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 		case DEVICE_ID_HELM:
 		{
 			float val = ConvertToHelmValue(ev.data);
-			printf("Received Helm=%f\n", val);
+			printf("\t\tReceived Helm=%f\n", val);
 
 			if(val<-45.0)		val=-45.0;
 			else if(val>45.0)	val=45.0;
@@ -62,7 +62,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 			break;
 		}
 		default:
-			printf("Received unhandled device value");
+			printf("\t\tReceived unhandled device value");
 			break;
 	}
 }

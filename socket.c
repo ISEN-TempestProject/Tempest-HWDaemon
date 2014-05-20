@@ -177,7 +177,7 @@ void SocketSendBattery(float voltage){
 		return;
 	}
 	struct Event ev;
-	ev.id = DEVICE_ID_COMPASS;
+	ev.id = DEVICE_ID_BATTERY;
 	ev.data[0] = (uint64_t)((voltage)*UINT64_MAX/18.0);;
 	ev.data[1] = 0;
 	SocketSendEvent(ev);

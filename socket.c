@@ -166,19 +166,19 @@ void SocketSendCompass(double angle){
 	}
 	struct Event ev;
 	ev.id = DEVICE_ID_COMPASS;
-	ev.data[0] = (uint64_t)((angle)*UINT64_MAX/360.0);;
+	ev.data[0] = (uint64_t)((angle)*UINT64_MAX/360.0);
 	ev.data[1] = 0;
 	SocketSendEvent(ev);
 }
 void SocketSendBattery(float voltage){
 	//voltage 0 : 18
-	if(voltage<0 || voltage>18){
+	if(voltage<0 || voltage>10){
 		printf("WARNING: Battery value out of bound (%f)\n", voltage);
 		return;
 	}
 	struct Event ev;
 	ev.id = DEVICE_ID_BATTERY;
-	ev.data[0] = (uint64_t)((voltage)*UINT64_MAX/18.0);;
+	ev.data[0] = (uint64_t)((voltage)*UINT64_MAX/10.0);
 	ev.data[1] = 0;
 	SocketSendEvent(ev);
 }

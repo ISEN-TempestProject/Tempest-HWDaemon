@@ -123,6 +123,11 @@ float ConvertToHelmValue(uint64_t data[2]){
 void SocketSendGps(double latitude, double longitude){
 	//lat -90 : 90
 	//lon -180 : 180
+	if(latitude<-90 || latitude>90 || longitude<-180 || longitude>180){
+		printf("WARNING: GPS value out of bound (%f|%f)\n", latitude, longitude);
+		return;
+	}
+
 	struct Event ev;
 	ev.id = DEVICE_ID_GPS;
 	ev.data[0] = (uint64_t)((latitude+90.0)*(UINT64_MAX/180.0));
@@ -131,6 +136,10 @@ void SocketSendGps(double latitude, double longitude){
 }
 void SocketSendRoll(double angle){
 	//angle -180 : 180
+	if(angle<-180 || angle>180){
+		printf("WARNING: Roll value out of bound (%f)\n", angle);
+		return;
+	}
 	struct Event ev;
 	ev.id = DEVICE_ID_ROLL;
 	ev.data[0] = (uint64_t)((angle+180.0)*UINT64_MAX/360.0);
@@ -139,6 +148,10 @@ void SocketSendRoll(double angle){
 }
 void SocketSendWindDir(double angle){
 	//angle -180 : 180
+	if(angle<-180 || angle>180){
+		printf("WARNING: WindDir value out of bound (%f)\n", angle);
+		return;
+	}
 	struct Event ev;
 	ev.id = DEVICE_ID_WINDDIR;
 	ev.data[0] = (uint64_t)((angle+180.0)*UINT64_MAX/360.0);
@@ -147,6 +160,10 @@ void SocketSendWindDir(double angle){
 }
 void SocketSendCompass(double angle){
 	//angle 0 : 360
+	if(angle<0 || angle>360){
+		printf("WARNING: Compass value out of bound (%f)\n", angle);
+		return;
+	}
 	struct Event ev;
 	ev.id = DEVICE_ID_COMPASS;
 	ev.data[0] = (uint64_t)((angle)*UINT64_MAX/360.0);;
@@ -155,6 +172,10 @@ void SocketSendCompass(double angle){
 }
 void SocketSendBattery(float voltage){
 	//voltage 0 : 18
+	if(voltage<0 || voltage>18){
+		printf("WARNING: Battery value out of bound (%f)\n", voltage);
+		return;
+	}
 	struct Event ev;
 	ev.id = DEVICE_ID_COMPASS;
 	ev.data[0] = (uint64_t)((voltage)*UINT64_MAX/18.0);;

@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
 	float fLastCompass(0);
 
 	//Setup accelerometer (roll)
-	Accelerometer acc(0,1,2);
+	Accelerometer acc(2, 0, 1);
 	float fLastRoll(0);
 
 	//Setup wind direction

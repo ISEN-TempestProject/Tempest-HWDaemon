@@ -56,15 +56,18 @@ int created = pthread_create(&thread, NULL, SocketThread, NULL);
 }
 
 void SocketClose(){
+	printf("Closing sockets\n");
     if(socketClient>=0)
         close(socketClient);
     if(socketServer>=0)
         close(socketServer);
 
+	printf("Socket closed\n");
+
 	if(thread!=0){
 
 		term = 1;
-		pthread_join(thread, NULL);
+		//pthread_join(thread, NULL);
 	}
 	system("rm /tmp/hwsocket>/dev/null");
 }

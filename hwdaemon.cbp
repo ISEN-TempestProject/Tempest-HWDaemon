@@ -37,6 +37,7 @@
 				</Linker>
 				<ExtraCommands>
 					<Add after="cp ${TARGET_OUTPUT_FILE} /tmp/sshfs" />
+					<Mode after="always" />
 				</ExtraCommands>
 				<MakeCommands>
 					<Build command="" />

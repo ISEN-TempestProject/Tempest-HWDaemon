@@ -87,8 +87,7 @@ using namespace std;
         while(m_acquire)
         {
             //wait for some data
-            if (!m_gpsrec->waiting(50000000)){
-                cout << "Continue..." << endl;
+            if (!m_gpsrec->waiting(5000000)){
                 continue;
             }
             if ((m_gpsdata = m_gpsrec->read()) == NULL) {

@@ -16,11 +16,13 @@ float Accelerometer::roll()
 
     //Get 3-axis gravity
     x = adc_x.GetValue() * scaling + offset;
-    y = adc_y.GetValue() * scaling + offset;
+    y = adc_y.GetValue() * scaling + offset + 0.15;
     z = (adc_z.GetValue() + biasCorrection) * scaling + offset;
 
     //Get roll
     roll = atan(y / sqrt(x*x + z*z)) * (180.0 / PI);
+
+//	printf("%f\t%f\t%f\t==>\t%f\n", x, y, z, roll);
 
     return roll;
 

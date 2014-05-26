@@ -4,7 +4,7 @@
 
 void InitCompass();
 
-float GetCompass();
+float GetCompass(float fRoll, float fPitch);
 
 
 #endif // COMPASS_H_INCLUDED

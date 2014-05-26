@@ -29,9 +29,9 @@ short int readY(int file);
 short int readZ(int file);
 short int zero(int file);
 
-short int XOUT_offset = 0;
-short int YOUT_offset = 0;
-short int ZOUT_offset = 0;
+short int XOUT_offset = +1;
+short int YOUT_offset = -15;
+short int ZOUT_offset = -4;
 
 
 short int initialize(int i2c_bus, int adresse){
@@ -104,7 +104,7 @@ short int zero(int file){
 	XOUT_offset = readX(file);
 	YOUT_offset = readY(file);
 	ZOUT_offset = readZ(file);
-	return 0;//TODO ??
+	return 0;
 }
 
 
@@ -131,11 +131,11 @@ void InitCompass()
 	i2c_bus = 1;
 	adresse = 0x1e;
 	file = initialize(i2c_bus, adresse);
-	zero(file);
+	//zero(file);
 }
 
 
-float GetCompass()
+float GetCompass(float fRoll, float fPitch)
 {
 	short x, y, z;
 
@@ -147,18 +147,40 @@ float GetCompass()
 	y = readY(file);
 	z = readZ(file);
 
-	angle = atan2((double)y,(double)x); //calcul du cap
+	float fCosRoll = cos(fRoll*PI/180.0);
+	float fSinRoll = sin(fRoll*PI/180.0);
+	float fCosPitch = cos(fPitch*PI/180.0);
+	float fSinPitch = sin(fPitch*PI/180.0);
+
+//	printf("%f\t%f\n", fCosRoll, fSinRoll);
+
+	//roll = rotY
+	float fX = x*fCosRoll + z*fSinRoll;
+	float fY = y;
+	float fZ = -x*fSinRoll + z*fCosRoll;
+
+	//pitch = rotX
+	float fX2 = fX;
+	float fY2 = fY*fCosPitch - fZ*fSinPitch;
+	float fZ2 = fY*fSinPitch + fZ*fCosPitch;
+
+
+	angle = atan2(fY2,fX2); //calcul du cap
+
 
 	float declinationAngle = 0.0457;
-	angle += declinationAngle;
+	angle -= declinationAngle;
+	angle *= 180/PI;
 
 	if (angle <0){   //correction du signe
-		angle += 2*PI;
+		angle += 360.0;
 	}
-	else if(angle > 2*PI){
-		angle -= 2*PI;
+	else if(angle >= 360){
+		angle -= 360.0;
 	}
 
-	return angle*(180/PI);
+//	printf("(%f) \t%f\t%f\t%f\t==>\t%f\n", fPitch, fX2, fY2, fZ2, angle);
+
+	return angle;
 }
 

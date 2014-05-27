@@ -109,14 +109,18 @@ float GetCompass(float fRoll, float fPitch)
 	float fSinPitch = sin(fPitch*PI/180.0);
 
 	//roll = rotY
-	float fX = x*fCosRoll + z*fSinRoll;
-	float fY = y;
-	float fZ = -x*fSinRoll + z*fCosRoll;
+//	float fX = x*fCosRoll + z*fSinRoll;
+//	float fY = y;
+//	float fZ = -x*fSinRoll + z*fCosRoll;
+//
+//	//pitch = rotX
+//	float fX2 = fX;
+//	float fY2 = fY*fCosPitch - fZ*fSinPitch;
+//	float fZ2 = fY*fSinPitch + fZ*fCosPitch;
 
-	//pitch = rotX
-	float fX2 = fX;
-	float fY2 = fY*fCosPitch - fZ*fSinPitch;
-	float fZ2 = fY*fSinPitch + fZ*fCosPitch;
+
+	float fX2 = x*fCosRoll + y*fSinPitch*fSinRoll + z*fCosPitch*fSinRoll;
+	float fY2 = y*fCosPitch - z*fSinPitch;
 
 
 	angle = atan2(fY2,fX2); //calcul du cap

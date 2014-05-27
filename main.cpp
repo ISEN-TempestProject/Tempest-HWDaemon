@@ -36,7 +36,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 		case DEVICE_ID_SAIL:
 		{
 			unsigned short val = ConvertToSailValue(ev.data);
-			printf("\t\tReceived Sail=%d\n", val);
+//			printf("\t\tReceived Sail=%d\n", val);
 
 			if(val>255)			val=255;
 
@@ -51,7 +51,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 		case DEVICE_ID_HELM:
 		{
 			float val = ConvertToHelmValue(ev.data);
-			printf("\t\tReceived Helm=%f\n", val);
+//			printf("\t\tReceived Helm=%f\n", val);
 
 			if(val<-45.0)		val=-45.0;
 			else if(val>45.0)	val=45.0;
@@ -142,7 +142,7 @@ int main(int argc, char const *argv[])
 			double fGps[2] = {gps->latitude(), gps->longitude()};
 			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
 			{
-				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
+//				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
 				SocketSendGps(fGps[0], fGps[1]);
 				fLastGPS[0] = fGps[0];
 				fLastGPS[1] = fGps[1];
@@ -153,14 +153,19 @@ int main(int argc, char const *argv[])
 			float fPitch = acc.pitch();
 			if(fabs(fRoll-fLastRoll)>4)//re-send compass for each 1degree variation
 			{
-				printf("Sending Roll=%f\n", fRoll);
+//				printf("Sending Roll=%f\n", fRoll);
 				SocketSendRoll(fRoll);
 				fLastRoll = fRoll;
 			}
 
 			// COMPASS HANDLING
-			float fCompass = GetCompass(fRoll, fPitch);
-			if(fabs(fCompass-fLastCompass)>3)//re-send compass for each 1degree variation
+			float fCompass = GetCompass(fRoll, fPitch) - 140;
+			if (fCompass <0)   //correction du signe
+				fCompass += 360.0;
+			else if(fCompass >= 360)
+				fCompass -= 360.0;
+
+//			if(fabs(fCompass-fLastCompass)>3)//re-send compass for each 1degree variation
 			{
 				printf("Sending Compass=%f\n", fCompass);
 				SocketSendCompass(fCompass);
@@ -181,7 +186,7 @@ int main(int argc, char const *argv[])
 
 			if(fabs(fWindDir-fLastWindDir)>1)//re-send compass for each 1degree variation
 			{
-				printf("Sending WindDir=%f\n", fWindDir);
+//				printf("Sending WindDir=%f\n", fWindDir);
 				SocketSendWindDir(fWindDir);
 				fLastWindDir = fWindDir;
 			}
@@ -190,7 +195,7 @@ int main(int argc, char const *argv[])
 			float fBattery = adcBattery.GetValue()*0.090818264;//voltage*R1/(R1+R2) = adcval*909/(909+9100)
 			if(fabs(fBattery-fLastBattery)>0.05)
 			{
-				printf("Sending Battery=%f\n", fBattery);
+//				printf("Sending Battery=%f\n", fBattery);
 				SocketSendBattery(fBattery);
 				fLastBattery = fBattery;
 			}

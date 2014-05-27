@@ -52,65 +52,6 @@ short int initialize(int i2c_bus, int adresse){
 }
 
 
-short int writeMode(int file){
-
-	i2c_smbus_write_byte_data(file, MODE, 0x00);
-	return 0;
-}
-
-short int writeRegA(int file){
-	i2c_smbus_write_byte_data(file, CRA, 0x70);
-	return 0;
-}
-
-short int writeRegB(int file){
-	i2c_smbus_write_byte_data(file, CRB, 0xa0);
-	return 0;
-}
-
-short int readX(int file){
-
-	i2c_smbus_write_byte(file, XOUT_H)<<8;
-	i2c_smbus_write_byte(file, XOUT_L);
-	short int data=0;
-  	data = i2c_smbus_read_byte_data(file, XOUT_H)<<8;
-  	data |= i2c_smbus_read_byte_data(file, XOUT_L);
-
-  	return data + XOUT_offset;
-}
-
-short int readY(int file){
-	i2c_smbus_write_byte(file, YOUT_H)<<8;
-	i2c_smbus_write_byte(file, YOUT_L);
-	short int data=0;
-	data = i2c_smbus_read_byte_data(file, YOUT_H)<<8;
-	data |= i2c_smbus_read_byte_data(file, YOUT_L);
-
-	return data + YOUT_offset;
-}
-
-
-short int readZ(int file){
-	i2c_smbus_write_byte(file, ZOUT_H)<<8;
-	i2c_smbus_write_byte(file, ZOUT_L);
-	short int data=0;
-	data = i2c_smbus_read_byte_data(file, ZOUT_H)<<8;
-	data |= i2c_smbus_read_byte_data(file, ZOUT_L);
-
-	return data + ZOUT_offset;
-}
-
-short int zero(int file){
-	XOUT_offset = -readX(file);
-	YOUT_offset = -readY(file);
-	ZOUT_offset = -readZ(file);
-	return 0;
-}
-
-
-
-
-
 
 
 
@@ -131,7 +72,10 @@ void InitCompass()
 	i2c_bus = 1;
 	adresse = 0x1e;
 	file = initialize(i2c_bus, adresse);
-	//zero(file);
+
+	i2c_smbus_write_byte_data(file, 0, 0b01110000);//CRA
+	i2c_smbus_write_byte_data(file, 1, 0b10100000);//CRB
+	i2c_smbus_write_byte_data(file, 2, 0b00000000);//MR
 }
 
 
@@ -142,14 +86,12 @@ float GetCompass(float fRoll, float fPitch)
 
 	short x, y, z;
 
-	writeRegA(file);
-	writeRegB(file);
-	writeMode(file);
+	x = (i2c_smbus_read_byte_data(file, 3)<<8 | i2c_smbus_read_byte_data(file, 4)) + XOUT_offset;
+	z = (i2c_smbus_read_byte_data(file, 5)<<8 | i2c_smbus_read_byte_data(file, 6)) + ZOUT_offset;
+	y = (i2c_smbus_read_byte_data(file, 7)<<8 | i2c_smbus_read_byte_data(file, 8)) + YOUT_offset;
+//	printf("%d\t%d\t%d\n", x, y, z);
 
-	x = readX(file);
-	y = readY(file);
-	z = readZ(file);
-
+//	//CALIBRATION
 //	static short mx=0, my=0, mz=0,Mx=0,My=0,Mz=0;
 //	if(x<mx)mx=x;
 //	if(y<my)my=y;
@@ -159,12 +101,12 @@ float GetCompass(float fRoll, float fPitch)
 //	if(z>Mz)Mz=z;
 //	printf("\t%d\t%d\t%d\t\t\t%d\t%d\t%d\n", mx, my, mz, Mx, My, Mz);
 
+
+//	printf("%f\t%f\n", fRoll, fPitch);
 	float fCosRoll = cos(fRoll*PI/180.0);
 	float fSinRoll = sin(fRoll*PI/180.0);
 	float fCosPitch = cos(fPitch*PI/180.0);
 	float fSinPitch = sin(fPitch*PI/180.0);
-
-//	printf("%f\t%f\n", fRoll, fPitch);
 
 	//roll = rotY
 	float fX = x*fCosRoll + z*fSinRoll;

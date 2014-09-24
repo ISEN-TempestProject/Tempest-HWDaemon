@@ -70,6 +70,4 @@
             void close();
     };
 
-    static void* acquireWrapper(void* obj);
-
 #endif

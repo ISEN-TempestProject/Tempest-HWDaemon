@@ -12,8 +12,8 @@ extern "C"{
 #include "Pwm.hpp"
 #include "Adc.hpp"
 #include "GpsHandler.h"
-#include "Accelerometer.hpp"
 #include "Gpio.hpp"
+#include "Imu.hpp"
 
 bool running = true;
 
@@ -94,13 +94,9 @@ int main(int argc, char const *argv[])
 	gps = GpsHandler::get();
 	double fLastGPS[2] = {0,0};
 
-	//Setup compass
-	InitCompass();
-	float fLastCompass(0);
-
-	//Setup accelerometer (roll)
-	Accelerometer acc(2, 0, 1);
-	float fLastRoll(0);
+	//Setup IMU
+	Imu imu("/dev/ttyO5", "BB-UART5");
+	float fLastRoll(0), fLastCompass(0);
 
 	//Setup wind direction
 	Gpio* gpioWind[6];//P8 pin numbers: 11 12 14 15 16 17
@@ -138,10 +134,12 @@ int main(int argc, char const *argv[])
 				fLastGPS[1] = fGps[1];
 			}
 
+			//Update IMU data
+			imu.Query();
+
 			// ACCELEROMETER HANDLING
-			float fRoll = acc.roll();
-			float fPitch = acc.pitch();
-			if(fabs(fRoll-fLastRoll)>4)//re-send compass for each 1degree variation
+			float fRoll = imu.Roll();
+			if(fabs(fmod(fRoll-fLastRoll, 360.0))>4)
 			{
 				printf("Sending Roll=%f\n", fRoll);
 				SocketSendRoll(fRoll);
@@ -149,13 +147,8 @@ int main(int argc, char const *argv[])
 			}
 
 			// COMPASS HANDLING
-			float fCompass = GetCompass(fRoll, fPitch) - 140;
-			if (fCompass <0)   //correction du signe
-				fCompass += 360.0;
-			else if(fCompass >= 360)
-				fCompass -= 360.0;
-
-			if(fabs(fCompass-fLastCompass)>3)//re-send compass for each 1degree variation
+			float fCompass = imu.Heading();
+			if(fabs(fmod(fCompass-fLastCompass, 360.0))>3)//re-send compass for each xdegree variation
 			{
 				printf("Sending Compass=%f\n", fCompass);
 				SocketSendCompass(fCompass);

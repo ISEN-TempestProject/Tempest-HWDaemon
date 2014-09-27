@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <math.h>
 
+#include <stropts.h>
+
 
 #include "utils.hpp"
 
@@ -44,6 +46,10 @@ Imu::Imu(const std::string& tty, const std::string& BB_UARTX){
 
 	tcsetattr(m_tty, TCSANOW, &termconf);
 
+	//Configure stream to message-nondiscard mode
+	// read ends when the specified number of bits are read or when got a "message end"
+	// TODO: Dont seem to work correctly
+//	ioctl(m_tty, I_SRDOPT, RMSGN);
 }
 Imu::~Imu(){
 	close(m_tty);
@@ -53,37 +59,52 @@ Imu::~Imu(){
 void Imu::Query()
 {
 	//Send F
+	printf("Send F\n");
 	write(m_tty, "F", 1);
-	// fsync(m_tty);
+	//fsync(m_tty);
 
-	//Read data head (Command & length)
+	// TODO: Because ioctl dont work, wait for answer to be received
+	usleep(100000);
+
 	IMUDataHead dataHead;
-	read(m_tty, &dataHead, sizeof(dataHead));
-
+//	printf("%d %d\n", sizeof(dataHead), sizeof(m_lastData));
+	int iBit = 0;
 	do{
+
+
+		//Read data head (Command & length)
+		int nRead = read(m_tty, &dataHead, sizeof(dataHead));
+
+		if(nRead<=0){
+			printf("Head read error %d\n", nRead);
+			return;
+		}
+
+
+		printf("Head = %d bits: Cmd=%c Length=%d\n", iBit+=2, dataHead.Cmd, dataHead.Length);
+
+
 		if(dataHead.Cmd == 'F'){
 			//Read the rest of the data
-			int nRead = read(m_tty, &m_lastData, sizeof(m_lastData));
+			nRead = read(m_tty, &m_lastData, sizeof(m_lastData));
 			if(nRead == sizeof(m_lastData)){
 				//Nothing to do, m_lastData contains everything now
 
 				//Heading
 				//printf("Psi=%.2f\n", m_lastData.Psi*180.0/M_PI);
-
+				printf("H%f P%f R%f\n", Heading(), Pitch(), Roll());
 				return;
 			}
 			else if(nRead!=0){
-				printf("Read count mismatch: %d should be %d", nRead, sizeof(m_lastData));
+				printf("Read count mismatch: %d should be %d\n", nRead, sizeof(m_lastData));
 			}
-			else{
+			else if(nRead<0){
 				printf("Read error\n");
 			}
 		}
 		else{
-			//Ignore data
-			// TODO: should not allocate data
-			uint8_t buf[dataHead.Length];
-			read(m_tty, buf, dataHead.Length);
+			//Garbage data
+			printf("Garbage data :/\n");
 		}
 	}while(dataHead.Cmd != 'F');
 

@@ -20,7 +20,6 @@
 				<Linker>
 					<Add option="-lgps" />
 					<Add option="-ldbus-1" />
-					<Add option="-rpath=&apos;/opt/libgps&apos;" />
 					<Add directory="/opt/libgps" />
 				</Linker>
 				<ExtraCommands>
@@ -56,14 +55,10 @@
 		</Unit>
 		<Unit filename="GpsHandler.cpp" />
 		<Unit filename="GpsHandler.h" />
+		<Unit filename="Imu.cpp" />
 		<Unit filename="Imu.hpp" />
 		<Unit filename="Pwm.cpp" />
 		<Unit filename="Pwm.hpp" />
-		<Unit filename="compass.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="compass.h" />
-		<Unit filename="i2c-dev.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="socket.c">
 			<Option compilerVar="CC" />

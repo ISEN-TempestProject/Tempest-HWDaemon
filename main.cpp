@@ -6,7 +6,6 @@
 
 extern "C"{
 	#include "socket.h"
-	#include "compass.h"
 }
 
 #include "Pwm.hpp"
@@ -91,7 +90,7 @@ int main(int argc, char const *argv[])
 
 	//Setup GPS
 	GpsHandler *gps;
-	gps = GpsHandler::get();
+//	gps = GpsHandler::get();
 	double fLastGPS[2] = {0,0};
 
 	//Setup IMU

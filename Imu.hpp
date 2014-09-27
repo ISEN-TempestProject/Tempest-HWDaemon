@@ -12,25 +12,23 @@ public:
 		float fRet = m_lastData.Psi;
 		if(fRet<0.0)
 			fRet+=2*3.14159265;
-		return fRet*3.14159265/180.0;
+		return fRet*180.0/3.14159265;
 	}
 
 	float Pitch(){
-		return m_lastData.Phi*3.14159265/180.0;//Maybe switch with roll?
+		return m_lastData.Phi*180.0/3.14159265;//Maybe switch with roll?
 	}
 
 	float Roll(){
-		return m_lastData.Theta*3.14159265/180.0;
+		return m_lastData.Theta*180.0/3.14159265;
 	}
 
 
 private:
-	struct IMUDataHead{
+
+	struct __attribute__((packed)) IMUData{ //packed suppress byte padding between elements
 		unsigned char Cmd;
 		uint8_t Length;
-	};
-
-	struct IMUData{
 		float Phi;//Roll?
 		float Theta;//Pitch?
 		float Psi;//Yaw

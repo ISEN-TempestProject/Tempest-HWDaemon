@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include <stropts.h>
+#include <errno.h>
 
 
 #include "utils.hpp"
@@ -16,8 +17,7 @@
 using namespace std;
 
 Imu::Imu(const std::string& tty, const std::string& BB_UARTX){
-	assert(sizeof(IMUDataHead)==2);
-	assert(sizeof(IMUData)==72);
+	assert(sizeof(IMUData)==74);
 
 	string sCapeMgrPath = FindDirContaining("/sys/devices", "bone_capemgr");
 	system(("echo "+BB_UARTX+" > "+sCapeMgrPath+"/slots").c_str());
@@ -55,57 +55,30 @@ Imu::~Imu(){
 	close(m_tty);
 }
 
-
 void Imu::Query()
 {
 	//Send F
-	printf("Send F\n");
 	write(m_tty, "F", 1);
-	//fsync(m_tty);
 
-	// TODO: Because ioctl dont work, wait for answer to be received
-	usleep(100000);
+	//Assemble the received message
+	size_t nByteCount = 0;
+	while(nByteCount<sizeof(m_lastData)){
 
-	IMUDataHead dataHead;
-//	printf("%d %d\n", sizeof(dataHead), sizeof(m_lastData));
-	int iBit = 0;
-	do{
+		//Pad received bytes at the right place in the struct
+		unsigned long addr = (unsigned long)(&m_lastData)+nByteCount;
 
+		//Read from stream
+		int nRead = read(m_tty, (void*)addr, sizeof(m_lastData)-nByteCount);
 
-		//Read data head (Command & length)
-		int nRead = read(m_tty, &dataHead, sizeof(dataHead));
-
-		if(nRead<=0){
-			printf("Head read error %d\n", nRead);
-			return;
+		if(nRead<0){
+			//Oh my gosh ! THIS SHOULD NEVER HAPPEN !
+			printf("Read error %d in %s:%d\n", errno, __FILE__, __LINE__);
+			break;
 		}
+		nByteCount+=nRead;
+		//printf("Read %d bytes. Total=%d\n", nRead, nByteCount);
+	}
 
-
-		printf("Head = %d bits: Cmd=%c Length=%d\n", iBit+=2, dataHead.Cmd, dataHead.Length);
-
-
-		if(dataHead.Cmd == 'F'){
-			//Read the rest of the data
-			nRead = read(m_tty, &m_lastData, sizeof(m_lastData));
-			if(nRead == sizeof(m_lastData)){
-				//Nothing to do, m_lastData contains everything now
-
-				//Heading
-				//printf("Psi=%.2f\n", m_lastData.Psi*180.0/M_PI);
-				printf("H%f P%f R%f\n", Heading(), Pitch(), Roll());
-				return;
-			}
-			else if(nRead!=0){
-				printf("Read count mismatch: %d should be %d\n", nRead, sizeof(m_lastData));
-			}
-			else if(nRead<0){
-				printf("Read error\n");
-			}
-		}
-		else{
-			//Garbage data
-			printf("Garbage data :/\n");
-		}
-	}while(dataHead.Cmd != 'F');
+	printf("H%f P%f R%f\n", Heading(), Pitch(), Roll());
 
 }

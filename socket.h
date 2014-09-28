@@ -30,13 +30,12 @@ void SocketClose();
 
 /**
 	@brief Demarre la gestion parallèle des clients
-	@return 0 si tout c'est bien passé, code d'erreur négatif sinon
 */
-int SocketHandleClients();
+void SocketHandleClients();
 
 /**
 	@brief Envoi un évènement à l'intelligence
-*/	
+*/
 void SocketSendEvent(struct Event ev);
 
 /**
@@ -57,7 +56,7 @@ float ConvertToHelmValue(uint64_t data[2]);
 
 /**
 	@brief Envoi de la position GPS (2x IEEE-754 64 bit floating point)
-	@arg latitude en degrés décimaux, entre -90° et 90° 
+	@arg latitude en degrés décimaux, entre -90° et 90°
 	@arg longitude en degrés décimaux, entre -180° et 180°
 */
 void SocketSendGps(double latitude, double longitude);

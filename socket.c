@@ -38,7 +38,6 @@ void CloseSockCS(struct sockcs* sock){
 
 void* SocketThread(void* args){
 	struct sockcs* sock = args;
-	return;
 	while(!term){
 		//On attend qu'un client se connecte au serveur
 		printf("\e[32mWaiting for client on %s socket...\e[m\n", sock->type==AF_UNIX?"UNIX":"TCP");
@@ -81,7 +80,6 @@ void SocketHandleClients(){
 	if(created<0){
 		printf("\e[1;31;43mUnable to start TCP socket thread\e[m");
 	}
-	return 0;
 }
 
 

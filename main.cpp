@@ -61,7 +61,7 @@ void SocketHandleReceivedEvent(struct Event ev){
 			break;
 		}
 		default:
-			printf("\t\tReceived unhandled device value");
+			printf("\t\tReceived unhandled device value\n");
 			break;
 	}
 }

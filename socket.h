@@ -12,7 +12,7 @@
 #define DEVICE_ID_COMPASS 6
 #define DEVICE_ID_BATTERY 7
 
-struct Event{
+struct __attribute__((packed)) Event{
 	uint8_t id;
 	uint64_t data[2];
 };

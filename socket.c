@@ -10,6 +10,35 @@
 #include <unistd.h>
 #include <errno.h>
 
+uint64_t htonll(uint64_t hll){
+	if(htons(42)!=42){
+		return (((uint64_t) htonl(hll)) << 32) + htonl(hll >> 32);
+	}
+	else
+		return hll;
+}
+uint64_t ntohll(uint64_t nll){
+	if(htons(42)!=42){
+		return (((uint64_t) ntohl(nll)) << 32) + ntohl(nll >> 32);
+	}
+	else
+		return nll;
+}
+uint8_t htonb(uint8_t hb){
+	if(htons(42)!=42){
+		return htons((uint16_t)hb)>>8;
+	}
+	else
+		return hb;
+}
+uint8_t ntohb(uint8_t nb){
+	if(htons(42)!=42){
+		return ntohs((uint16_t)nb)>>8;
+	}
+	else
+		return nb;
+}
+
 int term;
 
 struct sockcs{
@@ -53,7 +82,7 @@ void* SocketThread(void* args){
 		while(!term){
 
 			//Réception des données
-			char buffer[32];
+			char buffer[sizeof(struct Event)];
 			int nReceivedBytes=recv(sock->client, buffer, sizeof(buffer), MSG_WAITALL);
 			if(nReceivedBytes>0){
 				SocketHandleReceivedEvent(*((struct Event*)(buffer)));
@@ -178,8 +207,14 @@ int SocketInit(){
 void SocketSendEvent(struct Event ev){
 	if(sockcsUnix->client>=0)
 		send(sockcsUnix->client, &ev, sizeof(ev), MSG_DONTWAIT);
-	if(sockcsTcp->client>=0)
+	if(sockcsTcp->client>=0){
+		//Convert TCP data to network bit order
+		ev.id = htonb(ev.id);
+		ev.data[0] = htonll(ev.data[0]);
+		ev.data[1] = htonll(ev.data[1]);
+		//Send
 		send(sockcsTcp->client, &ev, sizeof(ev), MSG_DONTWAIT);
+	}
 }
 
 

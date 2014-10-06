@@ -16,11 +16,11 @@ public:
 	}
 
 	float Pitch(){
-		return m_lastData.Phi*180.0/3.14159265;//Maybe switch with roll?
+		return m_lastData.Theta*180.0/3.14159265;
 	}
 
 	float Roll(){
-		return m_lastData.Theta*180.0/3.14159265;
+		return m_lastData.Phi*180.0/3.14159265;
 	}
 
 

@@ -291,6 +291,17 @@ void SocketSendBattery(float voltage){
 }
 
 
+void SocketSendTurnSpeed(float speed){
+	if(speed<-360 || speed>360){
+		printf("\e[1;33mWARNING: Turn speed is fucking fast (%f)\e[m\n", speed);
+		return;
+	}
+	struct Event ev;
+	ev.id = DEVICE_ID_BATTERY;
+	ev.data[0] = (uint64_t)((speed+360.0)*UINT64_MAX/720.0);
+	ev.data[1] = 0;
+	SocketSendEvent(ev);
+}
 
 
 

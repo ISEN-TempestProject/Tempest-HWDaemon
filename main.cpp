@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
 
 	//Setup IMU
 	Imu imu("/dev/ttyO5", "BB-UART5");
-	float fLastRoll(0), fLastCompass(0);
+	float fLastRoll(0), fLastCompass(0), fLastTurnSpeed(0);
 
 	//Setup wind direction
 	Gpio* gpioWind[6];//P8 pin numbers: 11 12 14 15 16 17
@@ -143,6 +143,15 @@ int main(int argc, char const *argv[])
 				printf("Sending Roll=%f\n", fRoll);
 				SocketSendRoll(fRoll);
 				fLastRoll = fRoll;
+			}
+
+			// TURN SPEED HANDLING
+			float fTurnSpeed = imu.TurnSpeed();
+			if(fabs(fmod(fTurnSpeed-fTurnSpeed, 360.0))>4)
+			{
+				printf("Sending TurnSpeed=%f\n", fTurnSpeed);
+				SocketSendTurnSpeed(fTurnSpeed);
+				fLastTurnSpeed = fTurnSpeed;
 			}
 
 			// COMPASS HANDLING

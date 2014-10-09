@@ -23,6 +23,10 @@ public:
 		return m_lastData.Phi*180.0/3.14159265;
 	}
 
+	float TurnSpeed(){
+		return m_lastData.R*180.0/3.14159265;
+	}
+
 
 private:
 

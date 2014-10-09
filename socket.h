@@ -11,6 +11,7 @@
 #define DEVICE_ID_WINDDIR 5
 #define DEVICE_ID_COMPASS 6
 #define DEVICE_ID_BATTERY 7
+#define DEVICE_ID_TURNSPEED 8
 
 struct __attribute__((packed)) Event{
 	uint8_t id;
@@ -83,6 +84,12 @@ void SocketSendCompass(double angle);
 	@arg voltage Entre 0 et 18 volts
 **/
 void SocketSendBattery(float voltage);
+
+
+/**
+	@arg speed Vitesse de rotation en degrés par seconde
+**/
+void SocketSendTurnSpeed(float speed);
 
 
 #endif

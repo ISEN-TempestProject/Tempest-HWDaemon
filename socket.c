@@ -39,7 +39,7 @@ uint8_t ntohb(uint8_t nb){
 		return nb;
 }
 
-int term;
+int sockterm = 0;
 
 struct sockcs{
 	int type;
@@ -67,19 +67,19 @@ void CloseSockCS(struct sockcs* sock){
 
 void* SocketThread(void* args){
 	struct sockcs* sock = args;
-	while(!term){
+	while(!sockterm){
 		//On attend qu'un client se connecte au serveur
 		printf("\e[32mWaiting for client on %s socket...\e[m\n", sock->type==AF_UNIX?"UNIX":"TCP");
 		sock->client = accept(sock->server, NULL, NULL);
 		if(sock->client<0){
-			if(term) break;
+			if(sockterm) break;
 			printf("\e[1;33mAccept error on %s socket\e[m\n", sock->type==AF_UNIX?"UNIX":"TCP");
 			continue;
 		}
 		printf("\e[32mClient is connected on %s socket\e[m\n", sock->type==AF_UNIX?"UNIX":"TCP");
 
 		//On lit ce qu'il raconte
-		while(!term){
+		while(!sockterm){
 
 			//Réception des données
 			char buffer[sizeof(struct Event)];
@@ -98,7 +98,7 @@ void* SocketThread(void* args){
 
 
 void SocketHandleClients(){
-	term = 0;
+	sockterm = 0;
 
 	int created = pthread_create(&sockThreadUnix, NULL, SocketThread, sockcsUnix);
 	if(created<0){
@@ -120,7 +120,7 @@ void SocketClose(){
 	printf("\e[33mSockets closed\e[m\n");
 
 	if(sockThreadUnix!=0 || sockThreadTcp!=0)
-		term = 1;
+		sockterm = 1;
 
 	system("if [ -e /tmp/hwsocket ]\nthen\nrm /tmp/hwsocket\nfi");
 }

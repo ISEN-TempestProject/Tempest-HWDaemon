@@ -83,8 +83,8 @@ int main(int argc, char const *argv[])
 
 
     //Setup servo PWM
-	pwmMainSail = new Pwm(PWM2A, PWM_PERIOD, (MAIN_SAIL_DUTY_MAX-MAIN_SAIL_DUTY_MIN)/2+MAIN_SAIL_DUTY_MIN);
-	pwmSecondSail = new Pwm(PWM2B, PWM_PERIOD, (SECOND_SAIL_DUTY_MAX-SECOND_SAIL_DUTY_MIN)/2+SECOND_SAIL_DUTY_MIN);
+	pwmMainSail = new Pwm(PWM2B, PWM_PERIOD, (MAIN_SAIL_DUTY_MAX-MAIN_SAIL_DUTY_MIN)/2+MAIN_SAIL_DUTY_MIN);
+	pwmSecondSail = new Pwm(PWM2A, PWM_PERIOD, (SECOND_SAIL_DUTY_MAX-SECOND_SAIL_DUTY_MIN)/2+SECOND_SAIL_DUTY_MIN);
 	pwmHelm = new Pwm(PWM1A, PWM_PERIOD, (HELM_DUTY_MAX-HELM_DUTY_MIN)/2+HELM_DUTY_MIN);
 
 
@@ -98,17 +98,27 @@ int main(int argc, char const *argv[])
 	float fLastRoll(0), fLastCompass(0), fLastTurnSpeed(0);
 
 	//Setup wind direction
-	Gpio* gpioWind[6];//P8 pin numbers: 11 12 14 15 16 17
-	gpioWind[0] = new Gpio(45, Gpio::INPUT);
-	gpioWind[1] = new Gpio(44, Gpio::INPUT);
+	Gpio* gpioWind[6];//P8 pin numbers: 12 11 14 16 15 18
+	//Rule: 32*GpioPort+GpioPin
+	gpioWind[0] = new Gpio(44, Gpio::INPUT);
+	gpioWind[1] = new Gpio(45, Gpio::INPUT);
 	gpioWind[2] = new Gpio(26, Gpio::INPUT);
-	gpioWind[3] = new Gpio(47, Gpio::INPUT);
-	gpioWind[4] = new Gpio(46, Gpio::INPUT);
-	gpioWind[5] = new Gpio(27, Gpio::INPUT);
+	gpioWind[3] = new Gpio(46, Gpio::INPUT);
+	gpioWind[4] = new Gpio(47, Gpio::INPUT);
+	gpioWind[5] = new Gpio(65, Gpio::INPUT);
+
+
+	// //Old: 11 12 14 15 16 17
+	// gpioWind[0] = new Gpio(45, Gpio::INPUT);
+	// gpioWind[1] = new Gpio(44, Gpio::INPUT);
+	// gpioWind[2] = new Gpio(26, Gpio::INPUT);
+	// gpioWind[3] = new Gpio(47, Gpio::INPUT);
+	// gpioWind[4] = new Gpio(46, Gpio::INPUT);
+	// gpioWind[5] = new Gpio(27, Gpio::INPUT);
 	float fLastWindDir(0);
 
 	//Setup Battery probe
-	Adc adcBattery(3);
+	Adc adcBattery(2);
 	float fLastBattery(0);
 
 	usleep(100000);
@@ -124,14 +134,14 @@ int main(int argc, char const *argv[])
 		while(running){
 
 			// GPS HANDLING
-			double fGps[2] = {gps->latitude(), gps->longitude()};
-			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
-			{
-				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
-				SocketSendGps(fGps[0], fGps[1]);
-				fLastGPS[0] = fGps[0];
-				fLastGPS[1] = fGps[1];
-			}
+//			double fGps[2] = {gps->latitude(), gps->longitude()};
+//			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
+//			{
+//				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
+//				SocketSendGps(fGps[0], fGps[1]);
+//				fLastGPS[0] = fGps[0];
+//				fLastGPS[1] = fGps[1];
+//			}
 
 			//Update IMU data
 			imu.Query();

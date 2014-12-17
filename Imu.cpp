@@ -79,6 +79,6 @@ void Imu::Query()
 		//printf("Read %d bytes. Total=%d\n", nRead, nByteCount);
 	}
 
-	printf("H%f P%f R%f\n", Heading(), Pitch(), Roll());
+	//printf("H%f P%f R%f\n", Heading(), Pitch(), Roll());
 
 }

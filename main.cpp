@@ -90,7 +90,7 @@ int main(int argc, char const *argv[])
 
 	//Setup GPS
 	GpsHandler *gps;
-//	gps = GpsHandler::get();
+	gps = GpsHandler::get();
 	double fLastGPS[2] = {0,0};
 
 	//Setup IMU
@@ -134,14 +134,14 @@ int main(int argc, char const *argv[])
 		while(running){
 
 			// GPS HANDLING
-//			double fGps[2] = {gps->latitude(), gps->longitude()};
-//			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
-//			{
-//				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
-//				SocketSendGps(fGps[0], fGps[1]);
-//				fLastGPS[0] = fGps[0];
-//				fLastGPS[1] = fGps[1];
-//			}
+			double fGps[2] = {gps->latitude(), gps->longitude()};
+			if(!isnan(fGps[0]) && !isnan(fGps[1]) && (fGps[0]!=fLastGPS[0] || fGps[1]!=fLastGPS[1]) )
+			{
+				printf("Sending GPS=(%.10f,%.10f)\n", fGps[0], fGps[1]);
+				SocketSendGps(fGps[0], fGps[1]);
+				fLastGPS[0] = fGps[0];
+				fLastGPS[1] = fGps[1];
+			}
 
 			//Update IMU data
 			imu.Query();
@@ -157,7 +157,7 @@ int main(int argc, char const *argv[])
 
 			// TURN SPEED HANDLING
 			float fTurnSpeed = imu.TurnSpeed();
-			if(fabs(fmod(fTurnSpeed-fTurnSpeed, 360.0))>4)
+			if(fabs(fmod(fTurnSpeed-fLastTurnSpeed, 360.0))>4)
 			{
 				printf("Sending TurnSpeed=%f\n", fTurnSpeed);
 				SocketSendTurnSpeed(fTurnSpeed);

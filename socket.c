@@ -18,7 +18,7 @@ uint64_t htonll(uint64_t hll){
 		return hll;
 }
 uint64_t ntohll(uint64_t nll){
-	if(htons(42)!=42){
+	if(ntohs(42)!=42){
 		return (((uint64_t) ntohl(nll)) << 32) + ntohl(nll >> 32);
 	}
 	else
@@ -32,7 +32,7 @@ uint8_t htonb(uint8_t hb){
 		return hb;
 }
 uint8_t ntohb(uint8_t nb){
-	if(htons(42)!=42){
+	if(ntohs(42)!=42){
 		return ntohs((uint16_t)nb)>>8;
 	}
 	else
@@ -84,8 +84,14 @@ void* SocketThread(void* args){
 			//Réception des données
 			char buffer[sizeof(struct Event)];
 			int nReceivedBytes=recv(sock->client, buffer, sizeof(buffer), MSG_WAITALL);
+
+			struct Event e = *((struct Event*)(buffer));
+			e.id = ntohb(e.id);
+			e.data[0] = ntohll(e.data[0]);
+			e.data[1] = ntohll(e.data[1]);
+
 			if(nReceivedBytes>0){
-				SocketHandleReceivedEvent(*((struct Event*)(buffer)));
+				SocketHandleReceivedEvent(e);
 			}
 			else
 				break;
@@ -297,7 +303,7 @@ void SocketSendTurnSpeed(float speed){
 		return;
 	}
 	struct Event ev;
-	ev.id = DEVICE_ID_BATTERY;
+	ev.id = DEVICE_ID_TURNSPEED;
 	ev.data[0] = (uint64_t)((speed+360.0)*UINT64_MAX/720.0);
 	ev.data[1] = 0;
 	SocketSendEvent(ev);
